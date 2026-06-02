@@ -326,9 +326,9 @@ select.tk-input{cursor:pointer}
       <div class="kpi-scen" id="d-expenses-scen"></div>
     </div>
     <div class="card kpi kpi-amber">
-      <div class="kpi-label">Net Cash Flow</div>
+      <div class="kpi-label">Remaining Cash Flow</div>
       <div class="kpi-val" id="d-net">+$2,693</div>
-      <div class="kpi-sub" id="d-savings-rate">34.9% savings rate</div>
+      <div class="kpi-sub" id="d-savings-rate">income − expenses (before savings)</div>
       <div class="kpi-scen" id="d-net-scen"></div>
     </div>
     <div class="card kpi kpi-pink">
@@ -1034,22 +1034,29 @@ function loadState() {
 }
 
 /* ── Derived calculations ───────────────────────────────────────────────── */
+// Correct model — savings is an allocation from remaining, not an expense:
+//   totalExpenses = housing + bills + transport + food + personal + discretionary
+//   remaining     = totalIncome - totalExpenses   (cash before savings decision)
+//   savings       = d.savingsMo                   (explicit allocation)
+//   freeCash      = remaining - savings            (unallocated after savings)
+//   savingsRate   = savings / totalIncome
 function calc(d) {
-  const totalIncome = d.salary + d.rentIncome;
-  const housing = d.mortgage + d.oc;
-  const bills = d.electricity + d.water + d.hotWater + d.internet + d.netflix;
-  const transport = d.transport + d.healthIns + d.carIns + d.aasw;
-  const food = d.grocery;
-  const personal = d.dating + d.gym;
-  const discretionary = d.celebrations + d.travel;
-  const totalExpenses = housing + bills + transport + food + personal + discretionary + d.savingsMo;
-  const net = totalIncome - totalExpenses;
-  const free = totalIncome - (totalExpenses - d.savingsMo) - d.savingsMo; // truly free after savings
-  const savingsRate = totalIncome > 0 ? d.savingsMo / totalIncome : 0;
-  const propertyNet = d.rentIncome - d.mortgage - d.oc;
+  const totalIncome    = d.salary + d.rentIncome;
+  const housing        = d.mortgage + d.oc;
+  const bills          = d.electricity + d.water + d.hotWater + d.internet + d.netflix;
+  const transport      = d.transport + d.healthIns + d.carIns + d.aasw;
+  const food           = d.grocery;
+  const personal       = d.dating + d.gym;
+  const discretionary  = d.celebrations + d.travel;
+  const totalExpenses  = housing + bills + transport + food + personal + discretionary; // no savings
+  const remaining      = totalIncome - totalExpenses;    // cash flow before savings
+  const savings        = d.savingsMo;                    // explicit allocation
+  const freeCash       = remaining - savings;            // truly unallocated
+  const savingsRate    = totalIncome > 0 ? savings / totalIncome : 0;
+  const propertyNet    = d.rentIncome - d.mortgage - d.oc;
   const rentalCoverRatio = (d.mortgage + d.oc) > 0 ? d.rentIncome / (d.mortgage + d.oc) : 0;
   return { totalIncome, housing, bills, transport, food, personal, discretionary,
-           totalExpenses, net, free, savingsRate, propertyNet, rentalCoverRatio };
+           totalExpenses, remaining, savings, freeCash, savingsRate, propertyNet, rentalCoverRatio };
 }
 
 /* ── Forecast helpers ───────────────────────────────────────────────────── */
@@ -1115,21 +1122,35 @@ function render() {
   const sv = calc(scenarioData);
 
   // ── Dashboard ──
-  set('d-income', fmt(cv.totalIncome));
-  set('d-income-ann', fmt(cv.totalIncome * 12) + ' / year');
-  set('d-expenses', fmt(cv.totalExpenses - active.savingsMo));
-  set('d-expenses-ann', 'excl. savings allocation');
-  set('d-net', fmtS(active.savingsMo));
-  set('d-savings-rate', (cv.savingsRate * 100).toFixed(1) + '% savings rate');
-  set('d-savbal', fmt(active.savBal));
-  set('d-housing', fmt(cv.housing + cv.bills + cv.transport) + '/mo');
-  set('d-savrate', (cv.savingsRate * 100).toFixed(1) + '%');
-  set('d-eta', etaLabel(active.savBal, active.goalDeposit, active.savingsMo));
+  set('d-income',      fmt(cv.totalIncome));
+  set('d-income-ann',  fmt(cv.totalIncome * 12) + ' / year');
+  set('d-expenses',    fmt(cv.totalExpenses));
+  set('d-expenses-ann','excl. savings allocation');
+  set('d-net',         fmtS(cv.remaining));
+  set('d-savings-rate',(cv.savingsRate * 100).toFixed(1) + '% savings rate');
+  set('d-savbal',      fmt(active.savBal));
+  set('d-housing',     fmt(cv.housing + cv.bills + cv.transport) + '/mo');
+  set('d-savrate',     (cv.savingsRate * 100).toFixed(1) + '%');
+  set('d-eta',         etaLabel(active.savBal, active.goalDeposit, active.savingsMo));
 
-  renderScenDelta('d-income-scen', sv.totalIncome - bv.totalIncome, false);
-  renderScenDelta('d-expenses-scen', sv.totalExpenses - bv.totalExpenses, true);
-  renderScenDelta('d-net-scen', sv.net - bv.net, false);
-  renderScenDelta('d-savbal-scen', scenarioData.savBal - baseData.savBal, false);
+  // Dynamic colour — red only when the value is genuinely negative
+  const netEl = document.getElementById('d-net');
+  if (netEl) netEl.style.color = cv.remaining >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Scenario sub-lines — only shown in scenario mode.
+  // In base mode they're hidden; editing base while scenario is unchanged
+  // would produce spurious negative deltas on every tile.
+  if (mode === 'scenario') {
+    renderScenDelta('d-income-scen',   sv.totalIncome   - bv.totalIncome,   false);
+    renderScenDelta('d-expenses-scen', sv.totalExpenses - bv.totalExpenses, true);
+    renderScenDelta('d-net-scen',      sv.remaining     - bv.remaining,     false);
+    renderScenDelta('d-savbal-scen',   scenarioData.savBal - baseData.savBal, false);
+  } else {
+    ['d-income-scen','d-expenses-scen','d-net-scen','d-savbal-scen'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.className = 'kpi-scen'; }
+    });
+  }
 
   // ── Income ──
   const salaryFn = Math.round(active.salary * 12 / 26);
@@ -1150,11 +1171,10 @@ function render() {
   set('exp-food-total', fmt(cv.food));
   set('exp-personal-total', fmt(cv.personal));
   set('exp-disc-total', fmt(cv.discretionary));
-  set('exp-sav-total', fmt(active.savingsMo));
-  set('exp-total', fmt(cv.totalExpenses - active.savingsMo));
-  const remaining = cv.net;
-  set('exp-remaining', fmtS(remaining));
-  document.getElementById('exp-remaining').style.color = remaining >= 0 ? C.green : C.red;
+  set('exp-sav-total',      fmt(active.savingsMo));
+  set('exp-total',          fmt(cv.totalExpenses));          // expenses only, no savings
+  set('exp-remaining',      fmtS(cv.freeCash));              // after savings allocation
+  document.getElementById('exp-remaining').style.color = cv.freeCash >= 0 ? C.green : C.red;
   document.getElementById('f-travel-range').value = active.travel;
   document.getElementById('f-savingsmo-range').value = active.savingsMo;
   renderChartExpBar(active);
@@ -1208,10 +1228,10 @@ function set(id, v) { const el = document.getElementById(id); if (el) el.textCon
 function renderScenDelta(id, delta, invertSign) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (JSON.stringify(baseData) === JSON.stringify(scenarioData) || delta === 0) { el.textContent = ''; return; }
+  if (delta === 0) { el.textContent = 'same as base'; el.className = 'kpi-scen same'; return; }
   const good = invertSign ? delta < 0 : delta > 0;
   el.className = 'kpi-scen ' + (good ? 'up' : 'down');
-  el.textContent = 'Scenario: ' + fmtS(delta);
+  el.textContent = 'vs Base: ' + fmtS(delta);
 }
 
 function highlightChangedFields() {
@@ -1388,7 +1408,8 @@ function renderCmpTable(base, scen, bv, sv) {
     { label:'Celebrations/Gifts', bk:'celebrations', sk:'celebrations' },
     { label:'Savings', bk:'savingsMo', sk:'savingsMo' },
     { label:'Total Expenses', bv:Math.round(bv.totalExpenses), sv:Math.round(sv.totalExpenses), bold:true },
-    { label:'Net Cash Flow', bv:Math.round(bv.net), sv:Math.round(sv.net), bold:true, color:true },
+    { label:'Net Cash Flow', bv:Math.round(bv.remaining), sv:Math.round(sv.remaining), bold:true, color:true },
+    { label:'Free Cash (after savings)', bv:Math.round(bv.freeCash), sv:Math.round(sv.freeCash), bold:false, color:true },
   ];
 
   document.getElementById('cmp-table').innerHTML = rows.map(r => {
@@ -1524,10 +1545,10 @@ function renderChartCmp(bv, sv) {
   charts['cmpBar'] = new Chart(document.getElementById('c-cmp-bar'), {
     type:'bar',
     data:{
-      labels:['Total Income','Total Expenses','Net Cash Flow'],
+      labels:['Total Income','Total Expenses','Remaining','Free Cash'],
       datasets:[
-        {label:'Base',data:[Math.round(bv.totalIncome),Math.round(bv.totalExpenses),Math.round(bv.net)],backgroundColor:alpha(C.blue,.7)},
-        {label:'Scenario',data:[Math.round(sv.totalIncome),Math.round(sv.totalExpenses),Math.round(sv.net)],backgroundColor:alpha(C.amber,.7)}
+        {label:'Base',    data:[Math.round(bv.totalIncome),Math.round(bv.totalExpenses),Math.round(bv.remaining),Math.round(bv.freeCash)],backgroundColor:alpha(C.blue,.7)},
+        {label:'Scenario',data:[Math.round(sv.totalIncome),Math.round(sv.totalExpenses),Math.round(sv.remaining),Math.round(sv.freeCash)],backgroundColor:alpha(C.amber,.7)}
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
