@@ -375,19 +375,19 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Income Sources <span>edit to adjust</span></div>
 
       <div class="field-group">
-        <div class="field-label">Salary (monthly equiv.) <span class="field-default">default $6,717 · $3,100 × 26 ÷ 12</span></div>
+        <div class="field-label">Salary (fortnightly) <span class="field-default">default $3,100/fn</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
-          <input class="num-input" type="number" id="f-salary" value="6717" min="0" step="100" onchange="onFieldChange(this,'salary')">
+          <input class="num-input" type="number" id="f-salary" value="3100" min="0" step="50" onchange="onFieldChange(this,'salary')">
         </div>
-        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="salary-fn-disp">$3,100</span> · Annual: <span id="salary-ann-disp">$80,600</span></div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="salary-fn-disp">$3,100</span> · Monthly: <span id="salary-fn-mo"></span> · Annual: <span id="salary-ann-disp">$80,600</span></div>
       </div>
 
       <div class="field-group">
-        <div class="field-label">Rental Income (monthly equiv.) <span class="field-default">default $997 · $460 × 26 ÷ 12</span></div>
+        <div class="field-label">Rental Income (fortnightly) <span class="field-default">default $460/fn</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
-          <input class="num-input" type="number" id="f-rentincome" value="997" min="0" step="50" onchange="onFieldChange(this,'rentIncome')">
+          <input class="num-input" type="number" id="f-rentincome" value="460" min="0" step="10" onchange="onFieldChange(this,'rentIncome')">
         </div>
-        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="rent-fn-disp">$460</span> · Annual: <span id="rent-ann-disp">$11,960</span></div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="rent-fn-disp">$460</span> · Monthly: <span id="rent-fn-mo"></span> · Annual: <span id="rent-ann-disp">$11,960</span></div>
       </div>
 
       <div class="divider"></div>
@@ -427,13 +427,13 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Housing &amp; Fixed <span style="color:var(--blue)" id="exp-housing-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Mortgage <span class="field-default">default $1,907 · $880 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Mortgage (fortnightly) <span class="field-default">default $880/fn · ~$1,907/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-mortgage" value="1907" min="0" step="50" onchange="onFieldChange(this,'mortgage')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Owner Corp (OC) Fee <span class="field-default">default $433 · $200 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Owner Corp (OC) Fee (fortnightly) <span class="field-default">default $200/fn · ~$433/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-oc" value="433" min="0" step="10" onchange="onFieldChange(this,'oc')">
         </div>
@@ -467,7 +467,7 @@ select.tk-input{cursor:pointer}
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Netflix <span class="field-default">default $8 · $3.50 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Netflix (fortnightly) <span class="field-default">default $3.50/fn · ~$8/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-netflix" value="8" min="0" step="1" onchange="onFieldChange(this,'netflix')">
         </div>
@@ -477,25 +477,25 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Transport &amp; Insurance <span style="color:var(--cyan)" id="exp-transport-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Transport <span class="field-default">default $238 · $110 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Transport (fortnightly) <span class="field-default">default $110/fn · ~$238/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-transport" value="238" min="0" step="10" onchange="onFieldChange(this,'transport')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Health Insurance <span class="field-default">default $108 · $50 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Health Insurance (fortnightly) <span class="field-default">default $50/fn · ~$108/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-healthins" value="108" min="0" step="5" onchange="onFieldChange(this,'healthIns')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Car Insurance &amp; Rego <span class="field-default">default $271 · $125 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Car Insurance &amp; Rego (fortnightly) <span class="field-default">default $125/fn · ~$271/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-carins" value="271" min="0" step="5" onchange="onFieldChange(this,'carIns')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">AASW Membership <span class="field-default">default $108 · $50 fn × 26 ÷ 12</span></div>
+        <div class="field-label">AASW Membership (fortnightly) <span class="field-default">default $50/fn · ~$108/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-aasw" value="108" min="0" step="5" onchange="onFieldChange(this,'aasw')">
         </div>
@@ -507,7 +507,7 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Food <span style="color:var(--amber)" id="exp-food-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Grocery <span class="field-default">default $325 · $150 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Grocery (fortnightly) <span class="field-default">default $150/fn · ~$325/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-grocery" value="325" min="0" step="10" onchange="onFieldChange(this,'grocery')">
         </div>
@@ -517,13 +517,13 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Personal / Lifestyle <span style="color:var(--pink)" id="exp-personal-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Dating / Entertainment <span class="field-default">default $271 · $125 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Dating / Entertainment (fortnightly) <span class="field-default">default $125/fn · ~$271/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-dating" value="271" min="0" step="25" onchange="onFieldChange(this,'dating')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Gym <span class="field-default">default $37 · $17 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Gym (fortnightly) <span class="field-default">default $17/fn · ~$37/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-gym" value="37" min="0" step="5" onchange="onFieldChange(this,'gym')">
         </div>
@@ -533,19 +533,19 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Discretionary <span style="color:var(--purple)" id="exp-disc-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Celebrations / Gifts <span class="field-default">default $152 · $70 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Celebrations / Gifts (fortnightly) <span class="field-default">default $70/fn · ~$152/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-celebrations" value="152" min="0" step="10" onchange="onFieldChange(this,'celebrations')">
         </div>
       </div>
       <div class="field-group">
-        <div class="field-label">Travel <span class="field-default">default $867 · $400 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Travel (fortnightly) <span class="field-default">default $400/fn · ~$867/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-travel" value="867" min="0" step="50" onchange="onFieldChange(this,'travel')">
         </div>
         <div class="range-wrap">
           <span style="font-size:.72rem;color:var(--muted)">$0</span>
-          <input type="range" id="f-travel-range" min="0" max="2000" value="867" step="50" oninput="syncRangeToInput('f-travel-range','f-travel','travel')">
+          <input type="range" id="f-travel-range" min="0" max="1000" value="400" step="25" oninput="syncRangeToInput('f-travel-range','f-travel','travel')">
           <span style="font-size:.72rem;color:var(--muted)">$2k</span>
         </div>
       </div>
@@ -554,13 +554,13 @@ select.tk-input{cursor:pointer}
       <div class="section-hd">Savings Allocation <span style="color:var(--green)" id="exp-sav-total"></span></div>
 
       <div class="field-group">
-        <div class="field-label">Monthly Savings Contribution <span class="field-default">default $2,693 · $1,244.50 fn × 26 ÷ 12</span></div>
+        <div class="field-label">Fortnightly Savings Contribution <span class="field-default">default $1,244.50/fn · ~$2,693/mo</span></div>
         <div class="field-row"><span class="field-prefix">$</span>
           <input class="num-input" type="number" id="f-savingsmo" value="2693" min="0" step="100" onchange="onFieldChange(this,'savingsMo')">
         </div>
         <div class="range-wrap">
           <span style="font-size:.72rem;color:var(--muted)">$0</span>
-          <input type="range" id="f-savingsmo-range" min="0" max="6000" value="2693" step="50" oninput="syncRangeToInput('f-savingsmo-range','f-savingsmo','savingsMo')">
+          <input type="range" id="f-savingsmo-range" min="0" max="3000" value="1244.5" step="25" oninput="syncRangeToInput('f-savingsmo-range','f-savingsmo','savingsMo')">
           <span style="font-size:.72rem;color:var(--muted)">$6k</span>
         </div>
       </div>
@@ -966,33 +966,37 @@ select.tk-input{cursor:pointer}
 </main>
 
 <script>
-/* ── Spreadsheet defaults (all monthly) ────────────────────────────────── */
-// Fortnightly → monthly = value × 26 ÷ 12
-// Income: $3,100 fn salary, $460 fn rent → monthly
+/* ── Spreadsheet defaults — stored as FORTNIGHTLY values ────────────────── */
+// All inputs and defaults are in fortnightly (fn) terms, matching the spreadsheet.
+// calc() converts to monthly using × 26 ÷ 12.
+// Annual = fn × 26.   Monthly = fn × 26 ÷ 12.
+const FN_TO_MO = 26 / 12;          // multiply fn value → monthly
+const MO_TO_FN = 12 / 26;          // multiply monthly value → fn (for display)
+
 const DEFAULTS = {
-  salary: 6717,       // 3100 * 26 / 12
-  rentIncome: 997,    // 460  * 26 / 12
-  mortgage: 1907,     // 880  * 26 / 12
-  oc: 433,            // 200  * 26 / 12
-  electricity: 87,    // ~80/mo
-  water: 80,
-  hotWater: 60,
-  internet: 50,
-  netflix: 8,         // 3.5  * 26 / 12
-  transport: 238,     // 110  * 26 / 12
-  healthIns: 108,     // 50   * 26 / 12
-  carIns: 271,        // 125  * 26 / 12
-  aasw: 108,          // 50   * 26 / 12 (professional membership)
-  grocery: 325,       // 150  * 26 / 12
-  dating: 271,        // 125  * 26 / 12
-  gym: 37,            // 17   * 26 / 12
-  celebrations: 152,  // 70   * 26 / 12
-  travel: 867,        // 400  * 26 / 12
-  savingsMo: 2693,    // 1244.5 * 26 / 12
-  savBal: 82160,      // balance at Apr 2026 (12 Apr 2026 row in saving sheet)
-  goalDeposit: 140000,
+  salary:     3100,   // fn · spreadsheet row "Income (200 super)"
+  rentIncome:  460,   // fn · spreadsheet row "Rent income"
+  mortgage:    880,   // fn · spreadsheet Mortgage row
+  oc:          200,   // fn · OC/strata fee
+  electricity:  80,   // fn (~monthly $80 in spreadsheet; treat as fn for consistency)
+  water:        40,   // fn (monthly $80 ÷ 2)
+  hotWater:     30,   // fn (monthly $60 ÷ 2)
+  internet:     25,   // fn (monthly $50 ÷ 2)
+  netflix:     3.5,   // fn · spreadsheet row "Netflix $7"
+  transport:   110,   // fn
+  healthIns:    50,   // fn
+  carIns:      125,   // fn
+  aasw:         50,   // fn
+  grocery:     150,   // fn
+  dating:      125,   // fn
+  gym:          17,   // fn
+  celebrations: 70,   // fn
+  travel:      400,   // fn
+  savingsMo:  1244.5, // fn · spreadsheet "Saving" row
+  savBal:    82160,   // absolute balance (not fn/monthly)
+  goalDeposit:  140000,
   goalEmergency: 50000,
-  goalWealth: 300000
+  goalWealth:   300000
 };
 
 const FIELD_MAP = {
@@ -1013,8 +1017,8 @@ let baseData = Object.assign({}, DEFAULTS);
 let scenarioData = Object.assign({}, DEFAULTS);
 
 /* ── LocalStorage ───────────────────────────────────────────────────────── */
-const LS_BASE = 'ericafb_base_v1';
-const LS_SCEN = 'ericafb_scen_v1';
+const LS_BASE = 'ericafb_base_v2';
+const LS_SCEN = 'ericafb_scen_v2';
 
 function saveState() {
   try {
@@ -1034,26 +1038,27 @@ function loadState() {
 }
 
 /* ── Derived calculations ───────────────────────────────────────────────── */
+// All d.* fields are FORTNIGHTLY. Multiply by FN_TO_MO (26/12) to get monthly.
 // Correct model — savings is an allocation from remaining, not an expense:
 //   totalExpenses = housing + bills + transport + food + personal + discretionary
 //   remaining     = totalIncome - totalExpenses   (cash before savings decision)
-//   savings       = d.savingsMo                   (explicit allocation)
+//   savings       = d.savingsMo × FN_TO_MO        (explicit allocation)
 //   freeCash      = remaining - savings            (unallocated after savings)
-//   savingsRate   = savings / totalIncome
 function calc(d) {
-  const totalIncome    = d.salary + d.rentIncome;
-  const housing        = d.mortgage + d.oc;
-  const bills          = d.electricity + d.water + d.hotWater + d.internet + d.netflix;
-  const transport      = d.transport + d.healthIns + d.carIns + d.aasw;
-  const food           = d.grocery;
-  const personal       = d.dating + d.gym;
-  const discretionary  = d.celebrations + d.travel;
-  const totalExpenses  = housing + bills + transport + food + personal + discretionary; // no savings
-  const remaining      = totalIncome - totalExpenses;    // cash flow before savings
-  const savings        = d.savingsMo;                    // explicit allocation
-  const freeCash       = remaining - savings;            // truly unallocated
-  const savingsRate    = totalIncome > 0 ? savings / totalIncome : 0;
-  const propertyNet    = d.rentIncome - d.mortgage - d.oc;
+  const mo = FN_TO_MO;  // shorthand: multiply fn field → monthly
+  const totalIncome   = (d.salary + d.rentIncome) * mo;
+  const housing       = (d.mortgage + d.oc) * mo;
+  const bills         = (d.electricity + d.water + d.hotWater + d.internet + d.netflix) * mo;
+  const transport     = (d.transport + d.healthIns + d.carIns + d.aasw) * mo;
+  const food          = d.grocery * mo;
+  const personal      = (d.dating + d.gym) * mo;
+  const discretionary = (d.celebrations + d.travel) * mo;
+  const totalExpenses = housing + bills + transport + food + personal + discretionary;
+  const savings       = d.savingsMo * mo;
+  const remaining     = totalIncome - totalExpenses;
+  const freeCash      = remaining - savings;
+  const savingsRate   = totalIncome > 0 ? savings / totalIncome : 0;
+  const propertyNet   = (d.rentIncome - d.mortgage - d.oc) * mo;
   const rentalCoverRatio = (d.mortgage + d.oc) > 0 ? d.rentIncome / (d.mortgage + d.oc) : 0;
   return { totalIncome, housing, bills, transport, food, personal, discretionary,
            totalExpenses, remaining, savings, freeCash, savingsRate, propertyNet, rentalCoverRatio };
@@ -1079,11 +1084,12 @@ function etaMonths(currentBal, goal, monthlyContrib) {
 function buildForecast(d, numMonths) {
   const rows = [];
   let bal = d.savBal;
+  const savMo = d.savingsMo * FN_TO_MO;  // fortnightly → monthly
   const start = new Date(2026, 3, 1); // Apr 2026
   for (let i = 0; i < numMonths; i++) {
     const dt = new Date(start);
     dt.setMonth(start.getMonth() + i);
-    if (i > 0) bal += d.savingsMo;
+    if (i > 0) bal += savMo;
     rows.push({
       label: MONTHS[dt.getMonth()] + " '" + String(dt.getFullYear()).slice(2),
       bal: Math.round(bal),
@@ -1153,14 +1159,15 @@ function render() {
   }
 
   // ── Income ──
-  const salaryFn = Math.round(active.salary * 12 / 26);
-  const rentFn = Math.round(active.rentIncome * 12 / 26);
-  set('salary-fn-disp', '$' + salaryFn.toLocaleString());
-  set('salary-ann-disp', '$' + (salaryFn * 26).toLocaleString());
-  set('rent-fn-disp', '$' + rentFn.toLocaleString());
-  set('rent-ann-disp', '$' + (rentFn * 26).toLocaleString());
-  set('inc-total', fmt(cv.totalIncome));
-  set('inc-annual', fmt(cv.totalIncome * 12));
+  // d.salary and d.rentIncome are fortnightly; monthly = × FN_TO_MO; annual = × 26
+  set('salary-fn-disp',  '$' + Math.round(active.salary).toLocaleString());
+  set('salary-fn-mo',    '$' + Math.round(active.salary * FN_TO_MO).toLocaleString() + '/mo');
+  set('salary-ann-disp', '$' + Math.round(active.salary * 26).toLocaleString());
+  set('rent-fn-disp',    '$' + Math.round(active.rentIncome).toLocaleString());
+  set('rent-fn-mo',      '$' + Math.round(active.rentIncome * FN_TO_MO).toLocaleString() + '/mo');
+  set('rent-ann-disp',   '$' + Math.round(active.rentIncome * 26).toLocaleString());
+  set('inc-total',  fmt(cv.totalIncome));
+  set('inc-annual', fmt((active.salary + active.rentIncome) * 26));
   renderIncomeTable(active, cv);
   renderChartIncomePie(active);
 
@@ -1195,11 +1202,12 @@ function render() {
   renderChartPropBar(active, cv);
 
   // ── Savings ──
-  set('sv-bal', fmt(active.savBal));
-  set('sv-contrib', fmt(active.savingsMo));
-  set('sv-deposit-eta', etaLabel(active.savBal, active.goalDeposit, active.savingsMo));
-  set('sv-emergency-eta', etaLabel(active.savBal, active.goalEmergency, active.savingsMo));
-  set('sav-contrib-disp', fmt(active.savingsMo));
+  const savMo = active.savingsMo * FN_TO_MO; // fortnightly → monthly for display
+  set('sv-bal',           fmt(active.savBal));
+  set('sv-contrib',       fmt(savMo));
+  set('sv-deposit-eta',   etaLabel(active.savBal, active.goalDeposit, savMo));
+  set('sv-emergency-eta', etaLabel(active.savBal, active.goalEmergency, savMo));
+  set('sav-contrib-disp', fmt(savMo));
   renderGoalsProgress(active);
   renderSavingsForecast(active);
   renderForecastTable(active);
@@ -1244,10 +1252,11 @@ function highlightChangedFields() {
 
 /* ── Income table ───────────────────────────────────────────────────────── */
 function renderIncomeTable(d, cv) {
+  // d values are fortnightly; monthly = × FN_TO_MO; annual = × 26
   const rows = [
-    ['Salary', d.salary, d.salary * 12, d.salary / cv.totalIncome],
-    ['Rental Income', d.rentIncome, d.rentIncome * 12, d.rentIncome / cv.totalIncome],
-    ['Total', cv.totalIncome, cv.totalIncome * 12, 1],
+    ['Salary',        Math.round(d.salary * FN_TO_MO),      Math.round(d.salary * 26),      d.salary / (d.salary + d.rentIncome)],
+    ['Rental Income', Math.round(d.rentIncome * FN_TO_MO),  Math.round(d.rentIncome * 26),  d.rentIncome / (d.salary + d.rentIncome)],
+    ['Total',         Math.round(cv.totalIncome),            Math.round((d.salary + d.rentIncome) * 26), 1],
   ];
   document.getElementById('income-table').innerHTML = rows.map((r, i) => {
     const isTotal = i === rows.length - 1;
@@ -1262,6 +1271,7 @@ function renderIncomeTable(d, cv) {
 
 /* ── Goals progress ─────────────────────────────────────────────────────── */
 function renderGoalsProgress(d) {
+  const savMo = d.savingsMo * FN_TO_MO;
   const goals = [
     { name: 'Emergency Fund', target: d.goalEmergency, color: C.green },
     { name: 'House Deposit', target: d.goalDeposit, color: C.pink },
@@ -1273,7 +1283,7 @@ function renderGoalsProgress(d) {
 
   document.getElementById('goals-progress').innerHTML = goals.map((g, i) => {
     const pct = Math.min(100, (d.savBal / g.target) * 100);
-    const eta = etaLabel(d.savBal, g.target, d.savingsMo);
+    const eta = etaLabel(d.savBal, g.target, savMo);
     return `<div class="prog-wrap">
       <div class="prog-hd">
         <span>${g.name}</span>
@@ -1289,9 +1299,10 @@ function renderGoalsProgress(d) {
 
 /* ── Forecast table ─────────────────────────────────────────────────────── */
 function renderForecastTable(d) {
+  const savMo = d.savingsMo * FN_TO_MO;
   const rows = buildForecast(d, 24);
-  const depositMonth = etaMonths(d.savBal, d.goalDeposit, d.savingsMo);
-  const wealthMonth = etaMonths(d.savBal, d.goalWealth, d.savingsMo);
+  const depositMonth = etaMonths(d.savBal, d.goalDeposit, savMo);
+  const wealthMonth  = etaMonths(d.savBal, d.goalWealth,  savMo);
   const milestones = {};
   if (depositMonth > 0 && depositMonth < 24) milestones[depositMonth] = '🏠 House Deposit ' + fmt(d.goalDeposit);
   if (wealthMonth > 0 && wealthMonth < 24) milestones[wealthMonth] = '📈 Wealth Goal ' + fmt(d.goalWealth);
@@ -1311,13 +1322,14 @@ function renderForecastTable(d) {
 
 /* ── Summary ────────────────────────────────────────────────────────────── */
 function renderSummary(d, cv, bv) {
+  const savMo = d.savingsMo * FN_TO_MO;
   const metrics = [
-    ['Monthly Income', fmt(cv.totalIncome), 'td-g'],
-    ['Monthly Expenses (ex. savings)', fmt(cv.totalExpenses - d.savingsMo), 'td-r'],
-    ['Savings/month', fmt(d.savingsMo), 'td-b'],
-    ['Savings Rate', (cv.savingsRate * 100).toFixed(1) + '%', ''],
-    ['Housing Cost Ratio', ((cv.housing / cv.totalIncome) * 100).toFixed(1) + '%', 'td-a'],
-    ['Property Net/mo', fmtS(cv.propertyNet), cv.propertyNet >= 0 ? 'td-g' : 'td-r'],
+    ['Monthly Income',              fmt(cv.totalIncome),                              'td-g'],
+    ['Monthly Expenses (ex. sav.)', fmt(cv.totalExpenses),                            'td-r'],
+    ['Savings/month',               fmt(cv.savings),                                  'td-b'],
+    ['Savings Rate',                (cv.savingsRate * 100).toFixed(1) + '%',          ''],
+    ['Housing Cost Ratio',          ((cv.housing / cv.totalIncome) * 100).toFixed(1) + '%', 'td-a'],
+    ['Property Net/mo',             fmtS(cv.propertyNet), cv.propertyNet >= 0 ? 'td-g' : 'td-r'],
   ];
   document.getElementById('summary-metrics').innerHTML = metrics.map(r =>
     `<tr><td style="padding:6px 0">${r[0]}</td><td style="text-align:right;font-weight:600" class="${r[2]}">${r[1]}</td></tr>`
@@ -1325,9 +1337,9 @@ function renderSummary(d, cv, bv) {
 
   document.getElementById('summary-timeline').innerHTML = [
     `📍 Apr 2026: <strong>${fmt(d.savBal)}</strong> (today)`,
-    `📈 Apr 2027: <strong>${fmt(d.savBal + d.savingsMo * 12)}</strong>`,
-    `🏠 ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}: <strong>${fmt(d.goalDeposit)}</strong> — House Deposit`,
-    `📈 ${etaLabel(d.savBal, d.goalWealth, d.savingsMo)}: <strong>${fmt(d.goalWealth)}</strong> — Wealth Goal`,
+    `📈 Apr 2027: <strong>${fmt(d.savBal + savMo * 12)}</strong>`,
+    `🏠 ${etaLabel(d.savBal, d.goalDeposit, savMo)}: <strong>${fmt(d.goalDeposit)}</strong> — House Deposit`,
+    `📈 ${etaLabel(d.savBal, d.goalWealth,  savMo)}: <strong>${fmt(d.goalWealth)}</strong> — Wealth Goal`,
   ].map(s => `<div>${s}</div>`).join('');
 
   renderChartSumPie(d);
@@ -1335,8 +1347,10 @@ function renderSummary(d, cv, bv) {
 
 /* ── Insights ───────────────────────────────────────────────────────────── */
 function renderInsights(d, cv) {
+  const savMo       = d.savingsMo * FN_TO_MO;
+  const travelMo    = d.travel    * FN_TO_MO;
   const housingRatio = cv.housing / cv.totalIncome;
-  const travelRatio = d.travel / cv.totalIncome;
+  const travelRatio  = travelMo   / cv.totalIncome;
 
   const risks = [
     {
@@ -1345,39 +1359,39 @@ function renderInsights(d, cv) {
     },
     {
       title: 'Single Income Dependency',
-      body: `100% of earned income is from one employer ($${d.salary.toLocaleString()}/mo salary). No bonus buffer exists. Loss of employment would cut income by ${((d.salary/cv.totalIncome)*100).toFixed(0)}% almost immediately.`
+      body: `100% of earned income is from one employer (${fmt(d.salary * FN_TO_MO)}/mo salary). No bonus buffer exists. Loss of employment would cut income by ${((d.salary/(d.salary + d.rentIncome))*100).toFixed(0)}% almost immediately.`
     },
     {
       title: travelRatio > 0.1 ? 'High Travel Allocation' : 'Discretionary Exposure',
       body: travelRatio > 0.1
-        ? `Travel costs ${fmt(d.travel)}/mo (${(travelRatio*100).toFixed(1)}% of income). This is the largest discretionary line. Reducing to $500/mo saves ${fmt(d.travel - 500)}/mo.`
-        : `Celebrations + travel + dating = ${fmt(d.celebrations + d.travel + d.dating)}/mo. Manageable but worth monitoring against deposit timeline.`
+        ? `Travel costs ${fmt(travelMo)}/mo (${(travelRatio*100).toFixed(1)}% of income). Reducing to $500/mo saves ${fmt(travelMo - 500)}/mo.`
+        : `Celebrations + travel + dating = ${fmt((d.celebrations + d.travel + d.dating)*FN_TO_MO)}/mo. Manageable but worth monitoring against deposit timeline.`
     }
   ];
 
   const opps = [
     {
       title: 'Strong Savings Rate',
-      body: `${(cv.savingsRate * 100).toFixed(1)}% savings rate is well above typical 10–15% guidance. At this rate, the house deposit goal of ${fmt(d.goalDeposit)} is reached ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}.`
+      body: `${(cv.savingsRate * 100).toFixed(1)}% savings rate is well above typical 10–15% guidance. At this rate, the house deposit goal of ${fmt(d.goalDeposit)} is reached ${etaLabel(d.savBal, d.goalDeposit, savMo)}.`
     },
     {
       title: 'Rent Increase Upside',
-      body: `A 10% rent increase (+${fmt(d.rentIncome * 0.1)}/mo) lifts monthly net income by the same and cuts property shortfall from ${fmt(-cv.propertyNet)} to ${fmt(-(cv.propertyNet - d.rentIncome * 0.1))}/mo.`
+      body: `A 10% rent increase (+${fmt(d.rentIncome * FN_TO_MO * 0.1)}/mo) lifts monthly net income by the same and cuts property shortfall from ${fmt(-cv.propertyNet)} to ${fmt(Math.abs(cv.propertyNet - d.rentIncome * FN_TO_MO * 0.1))}/mo.`
     },
     {
       title: 'Travel Budget Flexibility',
-      body: `If travel drops from ${fmt(d.travel)} to ${fmt(d.travel * 0.6)}/mo, an extra ${fmt(d.travel * 0.4)} could redirect to savings — accelerating the deposit goal by ~${Math.ceil((d.goalDeposit - d.savBal) / (d.savingsMo + d.travel * 0.4)) - etaMonths(d.savBal, d.goalDeposit, d.savingsMo)} months.`
+      body: `If travel drops from ${fmt(travelMo)} to ${fmt(travelMo * 0.6)}/mo, an extra ${fmt(travelMo * 0.4)} could redirect to savings — accelerating the deposit goal by ~${Math.ceil((d.goalDeposit - d.savBal) / (savMo + travelMo * 0.4)) - etaMonths(d.savBal, d.goalDeposit, savMo)} months.`
     }
   ];
 
   const pris = [
     {
       title: 'Protect the Deposit Timeline',
-      body: `Current trajectory hits ${fmt(d.goalDeposit)} by ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}. Avoid one-off drawdowns on savings unless absolutely necessary.`
+      body: `Current trajectory hits ${fmt(d.goalDeposit)} by ${etaLabel(d.savBal, d.goalDeposit, savMo)}. Avoid one-off drawdowns on savings unless absolutely necessary.`
     },
     {
       title: 'Review AASW & Insurance',
-      body: `AASW ($${d.aasw.toLocaleString()}/mo) + health ($${d.healthIns.toLocaleString()}/mo) + car ins ($${d.carIns.toLocaleString()}/mo) = ${fmt(d.aasw+d.healthIns+d.carIns)}/mo. Annual review for better deals could save ~$500–$1k/year.`
+      body: `AASW (${fmt(d.aasw*FN_TO_MO)}/mo) + health (${fmt(d.healthIns*FN_TO_MO)}/mo) + car ins (${fmt(d.carIns*FN_TO_MO)}/mo) = ${fmt((d.aasw+d.healthIns+d.carIns)*FN_TO_MO)}/mo. Annual review for better deals could save ~$500–$1k/year.`
     },
     {
       title: 'Confirm Property Tax Benefits',
@@ -1394,35 +1408,34 @@ function renderInsights(d, cv) {
 
 /* ── Comparison table ───────────────────────────────────────────────────── */
 function renderCmpTable(base, scen, bv, sv) {
+  const m = FN_TO_MO; // fortnightly → monthly for display
   const rows = [
-    { label:'Salary', bk:'salary', sk:'salary' },
-    { label:'Rental Income', bk:'rentIncome', sk:'rentIncome' },
-    { label:'Total Income', bv:Math.round(bv.totalIncome), sv:Math.round(sv.totalIncome), bold:true },
-    { label:'Mortgage', bk:'mortgage', sk:'mortgage' },
-    { label:'Owner Corp Fee', bk:'oc', sk:'oc' },
-    { label:'Bills & Utilities', bv:base.electricity+base.water+base.hotWater+base.internet+base.netflix, sv:scen.electricity+scen.water+scen.hotWater+scen.internet+scen.netflix },
-    { label:'Transport & Ins.', bv:base.transport+base.healthIns+base.carIns+base.aasw, sv:scen.transport+scen.healthIns+scen.carIns+scen.aasw },
-    { label:'Grocery', bk:'grocery', sk:'grocery' },
-    { label:'Personal', bv:base.dating+base.gym, sv:scen.dating+scen.gym },
-    { label:'Travel', bk:'travel', sk:'travel' },
-    { label:'Celebrations/Gifts', bk:'celebrations', sk:'celebrations' },
-    { label:'Savings', bk:'savingsMo', sk:'savingsMo' },
-    { label:'Total Expenses', bv:Math.round(bv.totalExpenses), sv:Math.round(sv.totalExpenses), bold:true },
-    { label:'Net Cash Flow', bv:Math.round(bv.remaining), sv:Math.round(sv.remaining), bold:true, color:true },
-    { label:'Free Cash (after savings)', bv:Math.round(bv.freeCash), sv:Math.round(sv.freeCash), bold:false, color:true },
+    { label:'Salary',                     bv:Math.round(base.salary*m),       sv:Math.round(scen.salary*m) },
+    { label:'Rental Income',              bv:Math.round(base.rentIncome*m),   sv:Math.round(scen.rentIncome*m) },
+    { label:'Total Income',               bv:Math.round(bv.totalIncome),      sv:Math.round(sv.totalIncome), bold:true },
+    { label:'Mortgage',                   bv:Math.round(base.mortgage*m),     sv:Math.round(scen.mortgage*m) },
+    { label:'Owner Corp Fee',             bv:Math.round(base.oc*m),           sv:Math.round(scen.oc*m) },
+    { label:'Bills & Utilities',          bv:Math.round(bv.bills),            sv:Math.round(sv.bills) },
+    { label:'Transport & Ins.',           bv:Math.round(bv.transport),        sv:Math.round(sv.transport) },
+    { label:'Grocery',                    bv:Math.round(base.grocery*m),      sv:Math.round(scen.grocery*m) },
+    { label:'Personal',                   bv:Math.round(bv.personal),         sv:Math.round(sv.personal) },
+    { label:'Travel',                     bv:Math.round(base.travel*m),       sv:Math.round(scen.travel*m) },
+    { label:'Celebrations/Gifts',         bv:Math.round(base.celebrations*m), sv:Math.round(scen.celebrations*m) },
+    { label:'Savings',                    bv:Math.round(bv.savings),          sv:Math.round(sv.savings) },
+    { label:'Total Expenses',             bv:Math.round(bv.totalExpenses),    sv:Math.round(sv.totalExpenses), bold:true },
+    { label:'Remaining Cash Flow',        bv:Math.round(bv.remaining),        sv:Math.round(sv.remaining), bold:true, color:true },
+    { label:'Free Cash (after savings)',  bv:Math.round(bv.freeCash),         sv:Math.round(sv.freeCash), bold:false, color:true },
   ];
 
   document.getElementById('cmp-table').innerHTML = rows.map(r => {
-    const bVal = r.bv !== undefined ? r.bv : base[r.bk];
-    const sVal = r.sv !== undefined ? r.sv : scen[r.sk];
-    const delta = sVal - bVal;
+    const delta = r.sv - r.bv;
     const same = delta === 0;
     const posGood = r.color || (!r.label.includes('Expense') && !r.label.includes('Mortgage') && !r.label.includes('Bills') && !r.label.includes('Ins') && !r.label.includes('Fee') && !r.label.includes('Savings'));
     const cls = same ? '' : ((posGood ? delta > 0 : delta < 0) ? 'td-g' : 'td-r');
     return `<tr class="${r.bold ? 'tr-total' : ''}">
       <td>${r.label}</td>
-      <td>${fmt(bVal)}</td>
-      <td style="color:var(--amber)">${fmt(sVal)}</td>
+      <td>${fmt(r.bv)}</td>
+      <td style="color:var(--amber)">${fmt(r.sv)}</td>
       <td class="${cls}">${same ? '—' : fmtS(delta)}</td>
     </tr>`;
   }).join('');
@@ -1436,7 +1449,7 @@ function renderChartDashDonut(d, cv) {
     data:{
       labels:['Mortgage+OC','Bills','Transport&Ins','Food','Personal','Discretionary','Savings'],
       datasets:[{
-        data:[cv.housing,cv.bills,cv.transport,cv.food,cv.personal,cv.discretionary,d.savingsMo].map(Math.round),
+        data:[cv.housing,cv.bills,cv.transport,cv.food,cv.personal,cv.discretionary,cv.savings].map(Math.round),
         backgroundColor:[alpha(C.red,.8),alpha(C.purple,.8),alpha(C.cyan,.8),alpha(C.amber,.8),alpha(C.pink,.8),alpha(C.blue,.7),alpha(C.green,.8)],
         borderWidth:2,borderColor:'#1e293b'
       }]
@@ -1453,8 +1466,8 @@ function renderChartDashBar(d, cv) {
     data:{
       labels:['Salary','Rental','Mortgage','OC','Bills','Transport','Food','Personal','Discret.','Savings'],
       datasets:[
-        {label:'Income',data:[d.salary,d.rentIncome,0,0,0,0,0,0,0,0],backgroundColor:alpha(C.green,.75),stack:'a'},
-        {label:'Expense',data:[0,0,-d.mortgage,-d.oc,-cv.bills,-cv.transport,-cv.food,-cv.personal,-cv.discretionary,-d.savingsMo],backgroundColor:alpha(C.red,.75),stack:'a'}
+        {label:'Income', data:[Math.round(d.salary*FN_TO_MO),Math.round(d.rentIncome*FN_TO_MO),0,0,0,0,0,0,0,0],backgroundColor:alpha(C.green,.75),stack:'a'},
+        {label:'Expense',data:[0,0,-Math.round(d.mortgage*FN_TO_MO),-Math.round(d.oc*FN_TO_MO),-cv.bills,-cv.transport,-cv.food,-cv.personal,-cv.discretionary,-cv.savings].map(Math.round),backgroundColor:alpha(C.red,.75),stack:'a'}
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
@@ -1470,7 +1483,7 @@ function renderChartIncomePie(d) {
     data:{
       labels:['Salary','Rental Income'],
       datasets:[{
-        data:[d.salary, d.rentIncome],
+        data:[Math.round(d.salary*FN_TO_MO), Math.round(d.rentIncome*FN_TO_MO)],
         backgroundColor:[alpha(C.blue,.8),alpha(C.pink,.8)],
         borderWidth:2,borderColor:'#1e293b'
       }]
@@ -1483,20 +1496,29 @@ function renderChartIncomePie(d) {
 
 function renderChartExpBar(d) {
   destroyChart('expBar');
+  const m = FN_TO_MO; // all d.* fields are fortnightly; convert to monthly for chart
   const items = [
-    {l:'Mortgage',v:d.mortgage,c:C.red},{l:'Travel',v:d.travel,c:C.blue},
-    {l:'OC Fee',v:d.oc,c:C.red},{l:'Savings',v:d.savingsMo,c:C.green},
-    {l:'Grocery',v:d.grocery,c:C.amber},{l:'Car Ins',v:d.carIns,c:C.cyan},
-    {l:'Dating',v:d.dating,c:C.pink},{l:'Transport',v:d.transport,c:C.purple},
-    {l:'Celebrations',v:d.celebrations,c:C.blue},{l:'Electricity',v:d.electricity,c:C.purple},
-    {l:'AASW',v:d.aasw,c:C.cyan},{l:'Health Ins',v:d.healthIns,c:C.cyan},
-    {l:'Internet',v:d.internet,c:C.purple},{l:'Water',v:d.water,c:C.purple},
-    {l:'Hot Water',v:d.hotWater,c:C.purple},{l:'Gym',v:d.gym,c:C.pink},
-    {l:'Netflix',v:d.netflix,c:C.purple},
+    {l:'Mortgage',      v:d.mortgage    *m, c:C.red},
+    {l:'Travel',        v:d.travel      *m, c:C.blue},
+    {l:'OC Fee',        v:d.oc          *m, c:C.red},
+    {l:'Savings',       v:d.savingsMo   *m, c:C.green},
+    {l:'Grocery',       v:d.grocery     *m, c:C.amber},
+    {l:'Car Ins',       v:d.carIns      *m, c:C.cyan},
+    {l:'Dating',        v:d.dating      *m, c:C.pink},
+    {l:'Transport',     v:d.transport   *m, c:C.purple},
+    {l:'Celebrations',  v:d.celebrations*m, c:C.blue},
+    {l:'Electricity',   v:d.electricity *m, c:C.purple},
+    {l:'AASW',          v:d.aasw        *m, c:C.cyan},
+    {l:'Health Ins',    v:d.healthIns   *m, c:C.cyan},
+    {l:'Internet',      v:d.internet    *m, c:C.purple},
+    {l:'Water',         v:d.water       *m, c:C.purple},
+    {l:'Hot Water',     v:d.hotWater    *m, c:C.purple},
+    {l:'Gym',           v:d.gym         *m, c:C.pink},
+    {l:'Netflix',       v:d.netflix     *m, c:C.purple},
   ].sort((a,b)=>b.v-a.v);
   charts['expBar'] = new Chart(document.getElementById('c-exp-bar'), {
     type:'bar',
-    data:{labels:items.map(i=>i.l),datasets:[{label:'Monthly $',data:items.map(i=>i.v),backgroundColor:items.map(i=>alpha(i.c,.8))}]},
+    data:{labels:items.map(i=>i.l),datasets:[{label:'Monthly $',data:items.map(i=>Math.round(i.v)),backgroundColor:items.map(i=>alpha(i.c,.8))}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{x:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}
@@ -1510,7 +1532,7 @@ function renderChartPropBar(d, cv) {
     data:{
       labels:['Monthly Rental Income','Mortgage','Owner Corp Fee','Net Cash Flow'],
       datasets:[{
-        data:[d.rentIncome, -d.mortgage, -d.oc, cv.propertyNet],
+        data:[Math.round(d.rentIncome*FN_TO_MO), -Math.round(d.mortgage*FN_TO_MO), -Math.round(d.oc*FN_TO_MO), Math.round(cv.propertyNet)],
         backgroundColor:[alpha(C.green,.8),alpha(C.red,.8),alpha(C.amber,.8), cv.propertyNet >= 0 ? alpha(C.green,.8) : alpha(C.red,.5)]
       }]
     },
@@ -1564,7 +1586,7 @@ function renderChartSumPie(d) {
     data:{
       labels:['Salary','Rental Income'],
       datasets:[{
-        data:[d.salary, d.rentIncome],
+        data:[Math.round(d.salary*FN_TO_MO), Math.round(d.rentIncome*FN_TO_MO)],
         backgroundColor:[alpha(C.blue,.8),alpha(C.pink,.8)],
         borderWidth:2,borderColor:'#1e293b'
       }]
