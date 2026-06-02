@@ -153,6 +153,94 @@ tr:last-child td{border-bottom:none}
 /* ── Divider ─────────────────────────────────────────────────────────────── */
 .divider{height:1px;background:var(--border);margin:16px 0}
 
+/* ── Tracker styles ──────────────────────────────────────────────────────── */
+
+/* Quick-add form */
+.qadd-form{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.qadd-amount-wrap{position:relative}
+.qadd-amount-wrap .field-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;z-index:1;color:var(--muted);font-weight:600}
+.qadd-amount{padding-left:22px!important}
+.qadd-btn{padding:9px 20px;background:var(--pink);color:#fff;border:none;border-radius:7px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.qadd-btn:hover{background:#db2777}
+.qadd-btn:active{transform:scale(.97)}
+
+/* Category chips */
+.cat-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.cat-chip{padding:5px 12px;border-radius:9999px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
+.cat-chip:hover{border-color:var(--pink);color:var(--pink)}
+.cat-chip.active{background:var(--pink);border-color:var(--pink);color:#fff}
+
+/* Tracker inputs */
+.tk-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.tk-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-size:.88rem;padding:7px 10px;width:100%;font-family:inherit;transition:border-color .15s}
+.tk-input:focus{outline:none;border-color:var(--pink)}
+select.tk-input{cursor:pointer}
+
+/* Transaction list */
+.tx-list{max-height:380px;overflow-y:auto}
+.tx-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;
+  border:1px solid transparent;transition:background .12s;margin-bottom:4px}
+.tx-item:hover{background:var(--surface2);border-color:var(--border)}
+.tx-cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tx-details{flex:1;min-width:0}
+.tx-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:.7rem;color:var(--muted);margin-top:1px}
+.tx-amount{font-size:.9rem;font-weight:700;color:var(--red);flex-shrink:0}
+.tx-actions{display:flex;gap:4px;flex-shrink:0}
+.tx-btn{background:none;border:none;cursor:pointer;padding:3px 5px;border-radius:4px;font-size:.78rem;color:var(--muted);transition:all .12s}
+.tx-btn:hover{background:var(--surface2);color:var(--text)}
+.tx-btn.del:hover{color:var(--red)}
+
+/* Totals pills */
+.totals-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.total-pill{flex:1;min-width:90px;background:var(--surface2);border-radius:8px;padding:10px 12px;text-align:center}
+.total-pill .tp-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.total-pill .tp-val{font-size:1.05rem;font-weight:700;color:var(--red);margin-top:3px}
+.total-pill .tp-val.ok{color:var(--green)}
+
+/* Budget vs actual bars */
+.bva-row{margin-bottom:14px}
+.bva-hd{display:flex;justify-content:space-between;align-items:baseline;font-size:.8rem;margin-bottom:4px}
+.bva-hd .bva-cat{font-weight:600}
+.bva-hd .bva-nums{font-size:.72rem;color:var(--muted)}
+.bva-bar-bg{height:8px;background:var(--surface2);border-radius:9999px;overflow:hidden;position:relative}
+.bva-bar-budget{position:absolute;top:0;left:0;height:100%;border-radius:9999px;background:var(--border);opacity:.5}
+.bva-bar-actual{position:absolute;top:0;left:0;height:100%;border-radius:9999px;transition:width .4s ease}
+.bva-over .bva-bar-actual{background:var(--red)}
+.bva-under .bva-bar-actual{background:var(--green)}
+.bva-variance{font-size:.7rem;font-weight:600;margin-top:3px;text-align:right}
+.bva-over .bva-variance{color:var(--red)}
+.bva-under .bva-variance{color:var(--green)}
+
+/* Burn rate card */
+.burn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.burn-cell{background:var(--surface2);border-radius:8px;padding:12px;text-align:center}
+.burn-cell .bc-val{font-size:1.1rem;font-weight:700;margin-top:4px}
+.burn-cell .bc-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+
+/* Edit modal */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;align-items:center;justify-content:center}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;width:340px;max-width:94vw}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.modal-actions button{flex:1;padding:8px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-save{background:var(--pink);color:#fff}.btn-save:hover{background:#db2777}
+.btn-cancel{background:var(--surface2);color:var(--muted)}.btn-cancel:hover{color:var(--text)}
+
+/* Success flash */
+@keyframes flashIn{0%{opacity:0;transform:translateY(-8px)}60%{opacity:1;transform:translateY(0)}100%{opacity:0}}
+.add-flash{position:fixed;top:18px;right:18px;background:var(--green);color:#fff;
+  padding:9px 18px;border-radius:8px;font-size:.82rem;font-weight:700;z-index:400;
+  animation:flashIn 1.6s ease forwards;pointer-events:none}
+
+/* Daily limit indicator */
+.limit-bar-wrap{margin-top:10px}
+.limit-bar-bg{height:6px;background:var(--surface2);border-radius:9999px;overflow:hidden}
+.limit-bar-fill{height:100%;border-radius:9999px;transition:width .4s ease,background .3s}
+
 /* ── Hamburger / mobile ──────────────────────────────────────────────────── */
 #ham{display:none;position:fixed;top:12px;left:12px;z-index:200;
   background:var(--surface);border:1px solid var(--border);border-radius:7px;
@@ -194,6 +282,7 @@ tr:last-child td{border-bottom:none}
     <div class="nav-item" data-s="expenses"><span class="nav-icon">💸</span>Expenses</div>
     <div class="nav-item" data-s="property"><span class="nav-icon">🏠</span>Property</div>
     <div class="nav-item" data-s="savings"><span class="nav-icon">🎯</span>Savings</div>
+    <div class="nav-item" data-s="tracker"><span class="nav-icon">⚡</span>Tracker</div>
     <div class="nav-item" data-s="compare"><span class="nav-icon">⚖️</span>Comparison</div>
     <div class="nav-item" data-s="summary"><span class="nav-icon">📋</span>Summary</div>
   </nav>
@@ -261,21 +350,17 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <div class="card-grid g3 mt4">
-    <div class="card" style="border-left:4px solid var(--amber)">
-      <div class="kpi-label">Housing &amp; Fixed Costs</div>
-      <div style="font-size:1.2rem;font-weight:700;color:var(--amber)" id="d-housing">$2,200/mo</div>
-      <div class="kpi-sub">Mortgage + OC + bills + transport</div>
+  <!-- Tracker strip on dashboard -->
+  <div class="card mt4" style="border-left:4px solid var(--pink)">
+    <div class="section-hd" style="margin-bottom:10px">
+      This Month — Actual Spending
+      <span style="cursor:pointer;color:var(--pink)" onclick="navigate('tracker')">View tracker →</span>
     </div>
-    <div class="card" style="border-left:4px solid var(--green)">
-      <div class="kpi-label">House Deposit ETA</div>
-      <div style="font-size:1.2rem;font-weight:700;color:var(--green)" id="d-eta">Mar 2027</div>
-      <div class="kpi-sub">$140,000 deposit goal</div>
-    </div>
-    <div class="card" style="border-left:4px solid var(--blue)">
-      <div class="kpi-label">Savings Rate</div>
-      <div style="font-size:1.2rem;font-weight:700;color:var(--blue)" id="d-savrate">34.9%</div>
-      <div class="kpi-sub">% of gross income saved monthly</div>
+    <div class="totals-row" id="dash-tracker-pills">
+      <div class="total-pill"><div class="tp-label">Tracked Today</div><div class="tp-val" id="dt-today">$0</div></div>
+      <div class="total-pill"><div class="tp-label">Tracked This Month</div><div class="tp-val" id="dt-month">$0</div></div>
+      <div class="total-pill"><div class="tp-label">Month Budget</div><div class="tp-val ok" id="dt-budget">$0</div></div>
+      <div class="total-pill"><div class="tp-label">Remaining</div><div class="tp-val" id="dt-remaining">$0</div></div>
     </div>
   </div>
 </section>
@@ -624,6 +709,191 @@ tr:last-child td{border-bottom:none}
     </table>
   </div>
 </section>
+
+<!-- ── TRACKER ─────────────────────────────────────────────────────────────── -->
+<section id="tracker" class="section">
+  <div class="pg-title">Daily Tracker</div>
+  <div class="pg-sub">Log expenses in seconds — totals flow into your dashboard automatically</div>
+
+  <div class="card-grid g2">
+
+    <!-- ── Quick-add panel ── -->
+    <div class="card" style="border-top:3px solid var(--pink)">
+      <div class="section-hd">Quick Add <span>tap a category, enter amount, done</span></div>
+
+      <!-- Category chips -->
+      <div class="cat-chips" id="cat-chips">
+        <button class="cat-chip active" data-cat="Grocery" onclick="selectChip(this)">🛒 Grocery</button>
+        <button class="cat-chip" data-cat="Dining" onclick="selectChip(this)">🍽 Dining</button>
+        <button class="cat-chip" data-cat="Transport" onclick="selectChip(this)">🚌 Transport</button>
+        <button class="cat-chip" data-cat="Dating" onclick="selectChip(this)">💑 Dating</button>
+        <button class="cat-chip" data-cat="Gym" onclick="selectChip(this)">💪 Gym</button>
+        <button class="cat-chip" data-cat="Bills" onclick="selectChip(this)">💡 Bills</button>
+        <button class="cat-chip" data-cat="Insurance" onclick="selectChip(this)">🛡 Insurance</button>
+        <button class="cat-chip" data-cat="Travel" onclick="selectChip(this)">✈️ Travel</button>
+        <button class="cat-chip" data-cat="Celebrations" onclick="selectChip(this)">🎉 Celebrations</button>
+        <button class="cat-chip" data-cat="Other" onclick="selectChip(this)">📌 Other</button>
+      </div>
+
+      <!-- Amount + submit (fast path: just these two) -->
+      <div class="qadd-form">
+        <div>
+          <div class="field-label">Amount</div>
+          <div class="qadd-amount-wrap">
+            <span class="field-prefix">$</span>
+            <input class="num-input qadd-amount" id="qa-amount" type="number" min="0" step="0.01"
+              placeholder="0.00" autofocus
+              onkeydown="if(event.key==='Enter')quickAdd()">
+          </div>
+        </div>
+        <button class="qadd-btn" onclick="quickAdd()">+ Add</button>
+      </div>
+
+      <!-- Optional fields (collapsed by default) -->
+      <div id="qa-extras" style="margin-top:10px">
+        <div class="tk-row">
+          <div>
+            <div class="field-label">Date</div>
+            <input class="tk-input" type="date" id="qa-date">
+          </div>
+          <div>
+            <div class="field-label">Category override</div>
+            <select class="tk-input" id="qa-cat-select">
+              <option value="">— use chip —</option>
+              <option>Grocery</option>
+              <option>Dining</option>
+              <option>Transport</option>
+              <option>Dating</option>
+              <option>Gym</option>
+              <option>Bills</option>
+              <option>Insurance</option>
+              <option>Travel</option>
+              <option>Celebrations</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="field-label">Notes (optional)</div>
+          <input class="tk-input" type="text" id="qa-notes" placeholder="e.g. Coles, Myki top-up…"
+            onkeydown="if(event.key==='Enter')quickAdd()">
+        </div>
+      </div>
+
+      <!-- Daily limit indicator -->
+      <div class="limit-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:4px">
+          <span>Daily spend</span>
+          <span id="daily-limit-label">$0 today</span>
+        </div>
+        <div class="limit-bar-bg">
+          <div class="limit-bar-fill" id="daily-limit-fill" style="width:0%;background:var(--green)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted2);margin-top:3px">
+          <span>$0</span>
+          <span id="daily-limit-max"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Today / week / month totals ── -->
+    <div class="card">
+      <div class="section-hd">Spending Totals</div>
+      <div class="totals-row">
+        <div class="total-pill">
+          <div class="tp-label">Today</div>
+          <div class="tp-val" id="tt-today">$0</div>
+        </div>
+        <div class="total-pill">
+          <div class="tp-label">This Week</div>
+          <div class="tp-val" id="tt-week">$0</div>
+        </div>
+        <div class="total-pill">
+          <div class="tp-label">This Month</div>
+          <div class="tp-val" id="tt-month">$0</div>
+        </div>
+        <div class="total-pill">
+          <div class="tp-label">Month Budget</div>
+          <div class="tp-val ok" id="tt-budget">$0</div>
+        </div>
+      </div>
+
+      <!-- Burn rate / projection -->
+      <div class="burn-grid mt3" id="burn-grid">
+        <div class="burn-cell">
+          <div class="bc-label">Daily Avg</div>
+          <div class="bc-val td-r" id="br-daily">$0</div>
+        </div>
+        <div class="burn-cell">
+          <div class="bc-label">Month Projection</div>
+          <div class="bc-val" id="br-proj">$0</div>
+        </div>
+        <div class="burn-cell">
+          <div class="bc-label">vs Budget</div>
+          <div class="bc-val" id="br-vs">—</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Recent Transactions <span id="tx-count-label"></span></div>
+      <div class="tx-list" id="tx-list">
+        <div style="text-align:center;color:var(--muted);padding:24px 0;font-size:.82rem">No expenses logged yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Budget vs Actual ── -->
+  <div class="card mt4">
+    <div class="section-hd">Budget vs Actual <span>this month — tracked categories only</span></div>
+    <div id="bva-container"></div>
+  </div>
+
+  <!-- ── Top categories chart ── -->
+  <div class="card mt4">
+    <div class="section-hd">Spending by Category <span>this month</span></div>
+    <div class="chart-wrap" style="height:240px"><canvas id="c-tracker-cat"></canvas></div>
+  </div>
+
+  <!-- ── Daily spend chart ── -->
+  <div class="card mt4">
+    <div class="section-hd">Daily Spend — Last 14 Days</div>
+    <div class="chart-wrap" style="height:200px"><canvas id="c-tracker-daily"></canvas></div>
+  </div>
+</section>
+
+<!-- ── Edit modal ──────────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="edit-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Edit Expense</div>
+    <input type="hidden" id="edit-id">
+    <div class="field-group">
+      <div class="field-label">Amount</div>
+      <div class="field-row"><span class="field-prefix">$</span>
+        <input class="num-input" type="number" id="edit-amount" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Category</div>
+      <select class="tk-input" id="edit-cat">
+        <option>Grocery</option><option>Dining</option><option>Transport</option>
+        <option>Dating</option><option>Gym</option><option>Bills</option>
+        <option>Insurance</option><option>Travel</option><option>Celebrations</option><option>Other</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Date</div>
+      <input class="tk-input" type="date" id="edit-date">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Notes</div>
+      <input class="tk-input" type="text" id="edit-notes" placeholder="Optional">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveEdit()">Save</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── COMPARISON ─────────────────────────────────────────────────────────── -->
 <section id="compare" class="section">
@@ -1365,10 +1635,368 @@ function toggleSidebar() {
   document.getElementById('overlay').classList.toggle('open');
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   DAILY EXPENSE TRACKER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tracker state & storage ─────────────────────────────────────────────── */
+const LS_TXN = 'ericafb_txns_v1';
+let transactions = [];
+
+// Category → dashboard budget key mapping
+const CAT_TO_BUDGET = {
+  'Grocery':      'grocery',
+  'Dining':       'dating',      // closest: dining out maps to dating/entertainment
+  'Transport':    'transport',
+  'Dating':       'dating',
+  'Gym':          'gym',
+  'Bills':        'electricity', // representative of bills bucket
+  'Insurance':    'carIns',
+  'Travel':       'travel',
+  'Celebrations': 'celebrations',
+  'Other':        null
+};
+
+// Budget per category (monthly, sourced from active baseData)
+function getBudgets() {
+  const d = baseData;
+  return {
+    'Grocery':      d.grocery,
+    'Dining':       Math.round(d.dating * 0.5),  // split dating between dining/dating
+    'Transport':    d.transport,
+    'Dating':       Math.round(d.dating * 0.5),
+    'Gym':          d.gym,
+    'Bills':        d.electricity + d.water + d.hotWater + d.internet + d.netflix,
+    'Insurance':    d.healthIns + d.carIns,
+    'Travel':       d.travel,
+    'Celebrations': d.celebrations,
+    'Other':        0
+  };
+}
+
+function totalMonthlyDiscretionary() {
+  const cv = calc(baseData);
+  return Math.round(cv.food + cv.personal + cv.discretionary + cv.bills);
+}
+
+// Category accent colours
+const CAT_COLOR = {
+  'Grocery':'#f59e0b','Dining':'#ec4899','Transport':'#06b6d4',
+  'Dating':'#a855f7','Gym':'#10b981','Bills':'#3b82f6',
+  'Insurance':'#6366f1','Travel':'#f97316','Celebrations':'#e879f9','Other':'#94a3b8'
+};
+
+/* ── LocalStorage helpers ────────────────────────────────────────────────── */
+function saveTxns() {
+  try { localStorage.setItem(LS_TXN, JSON.stringify(transactions)); } catch(e) {}
+}
+function loadTxns() {
+  try {
+    const raw = localStorage.getItem(LS_TXN);
+    if (raw) transactions = JSON.parse(raw);
+  } catch(e) { transactions = []; }
+}
+
+/* ── Date helpers ────────────────────────────────────────────────────────── */
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function isToday(dateStr) { return dateStr === todayStr(); }
+function isThisWeek(dateStr) {
+  const now = new Date(); const d = new Date(dateStr + 'T00:00:00');
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0,0,0,0);
+  return d >= startOfWeek && d <= now;
+}
+function isThisMonth(dateStr) {
+  const now = new Date(); const d = new Date(dateStr + 'T00:00:00');
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+}
+function dayOfMonth() { return new Date().getDate(); }
+function daysInMonth() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth()+1, 0).getDate(); }
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-AU', {day:'numeric',month:'short'});
+}
+
+/* ── Quick add ───────────────────────────────────────────────────────────── */
+let selectedChipCat = 'Grocery';
+
+function selectChip(btn) {
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  selectedChipCat = btn.dataset.cat;
+}
+
+function quickAdd() {
+  const amountEl = document.getElementById('qa-amount');
+  const amount = parseFloat(amountEl.value);
+  if (!amount || amount <= 0) { amountEl.focus(); amountEl.style.borderColor = C.red; setTimeout(() => amountEl.style.borderColor = '', 800); return; }
+
+  const catOverride = document.getElementById('qa-cat-select').value;
+  const cat = catOverride || selectedChipCat;
+  const dateEl = document.getElementById('qa-date');
+  const date = dateEl.value || todayStr();
+  const notes = document.getElementById('qa-notes').value.trim();
+
+  transactions.unshift({ id: Date.now(), amount, cat, date, notes });
+  saveTxns();
+
+  // Reset form
+  amountEl.value = '';
+  document.getElementById('qa-notes').value = '';
+  document.getElementById('qa-cat-select').value = '';
+  amountEl.focus();
+
+  // Flash confirmation
+  const flash = document.createElement('div');
+  flash.className = 'add-flash';
+  flash.textContent = '✓ $' + amount.toFixed(2) + ' · ' + cat;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1700);
+
+  renderTracker();
+  renderDashboardTrackerStrip();
+}
+
+/* ── Edit / delete ───────────────────────────────────────────────────────── */
+function openEdit(id) {
+  const tx = transactions.find(t => t.id === id);
+  if (!tx) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-amount').value = tx.amount;
+  document.getElementById('edit-cat').value = tx.cat;
+  document.getElementById('edit-date').value = tx.date;
+  document.getElementById('edit-notes').value = tx.notes || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('edit-modal').classList.remove('open'); }
+function saveEdit() {
+  const id = parseInt(document.getElementById('edit-id').value);
+  const tx = transactions.find(t => t.id === id);
+  if (!tx) return;
+  tx.amount = parseFloat(document.getElementById('edit-amount').value) || 0;
+  tx.cat = document.getElementById('edit-cat').value;
+  tx.date = document.getElementById('edit-date').value;
+  tx.notes = document.getElementById('edit-notes').value.trim();
+  saveTxns();
+  closeModal();
+  renderTracker();
+  renderDashboardTrackerStrip();
+}
+function deleteTxn(id) {
+  if (!confirm('Delete this expense?')) return;
+  transactions = transactions.filter(t => t.id !== id);
+  saveTxns();
+  renderTracker();
+  renderDashboardTrackerStrip();
+}
+
+/* ── Aggregate helpers ───────────────────────────────────────────────────── */
+function sumByPredicate(pred) { return transactions.filter(t => pred(t.date)).reduce((s,t) => s + t.amount, 0); }
+function sumThisMonth() { return sumByPredicate(isThisMonth); }
+function sumToday() { return sumByPredicate(isToday); }
+function sumThisWeek() { return sumByPredicate(isThisWeek); }
+
+function monthlyByCat() {
+  const result = {};
+  transactions.filter(t => isThisMonth(t.date)).forEach(t => {
+    result[t.cat] = (result[t.cat] || 0) + t.amount;
+  });
+  return result;
+}
+
+/* ── Render tracker section ──────────────────────────────────────────────── */
+function renderTracker() {
+  const today = sumToday();
+  const week  = sumThisWeek();
+  const month = sumThisMonth();
+  const budgetTotal = totalMonthlyDiscretionary();
+
+  // Totals pills
+  set('tt-today', '$' + today.toFixed(2));
+  set('tt-week',  '$' + week.toFixed(2));
+  set('tt-month', '$' + month.toFixed(2));
+  set('tt-budget','$' + budgetTotal.toLocaleString());
+  document.getElementById('tt-month').style.color = month > budgetTotal ? C.red : C.green;
+
+  // Burn rate
+  const dom = dayOfMonth();
+  const dailyAvg = dom > 0 ? month / dom : 0;
+  const projection = dailyAvg * daysInMonth();
+  const vsLabel = projection > budgetTotal
+    ? '+$' + Math.round(projection - budgetTotal).toLocaleString() + ' over'
+    : '−$' + Math.round(budgetTotal - projection).toLocaleString() + ' under';
+  set('br-daily', '$' + dailyAvg.toFixed(0));
+  set('br-proj',  '$' + Math.round(projection).toLocaleString());
+  set('br-vs', vsLabel);
+  document.getElementById('br-vs').style.color = projection > budgetTotal ? C.red : C.green;
+
+  // Daily limit bar (budget ÷ days-in-month = daily target)
+  const dailyTarget = budgetTotal / daysInMonth();
+  const limitPct = Math.min(100, (today / dailyTarget) * 100);
+  document.getElementById('daily-limit-fill').style.width = limitPct + '%';
+  document.getElementById('daily-limit-fill').style.background = limitPct > 100 ? C.red : limitPct > 75 ? C.amber : C.green;
+  set('daily-limit-label', '$' + today.toFixed(2) + ' today');
+  set('daily-limit-max', 'Daily target: $' + dailyTarget.toFixed(0));
+
+  // Transaction list (latest 50)
+  renderTxList();
+
+  // Budget vs Actual bars
+  renderBVA();
+
+  // Charts
+  renderTrackerCatChart();
+  renderTrackerDailyChart();
+}
+
+function renderTxList() {
+  const list = document.getElementById('tx-list');
+  const shown = transactions.slice(0, 50);
+  set('tx-count-label', transactions.length + ' total');
+  if (!shown.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;font-size:.82rem">No expenses yet — add one above ↑</div>';
+    return;
+  }
+  list.innerHTML = shown.map(tx => `
+    <div class="tx-item">
+      <div class="tx-cat-dot" style="background:${CAT_COLOR[tx.cat]||C.muted}"></div>
+      <div class="tx-details">
+        <div class="tx-name">${tx.cat}${tx.notes ? ' · ' + tx.notes : ''}</div>
+        <div class="tx-meta">${formatDate(tx.date)}${isToday(tx.date) ? ' · today' : ''}</div>
+      </div>
+      <div class="tx-amount">−$${tx.amount.toFixed(2)}</div>
+      <div class="tx-actions">
+        <button class="tx-btn" onclick="openEdit(${tx.id})" title="Edit">✏️</button>
+        <button class="tx-btn del" onclick="deleteTxn(${tx.id})" title="Delete">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderBVA() {
+  const catTotals = monthlyByCat();
+  const budgets = getBudgets();
+  const cats = Object.keys(budgets).filter(c => budgets[c] > 0 || catTotals[c]);
+  const maxVal = Math.max(...cats.map(c => Math.max(budgets[c]||0, catTotals[c]||0)), 1);
+
+  document.getElementById('bva-container').innerHTML = cats.map(cat => {
+    const actual = catTotals[cat] || 0;
+    const budget = budgets[cat] || 0;
+    const over = actual > budget && budget > 0;
+    const pctActual = Math.min(100, (actual / maxVal) * 100);
+    const pctBudget = Math.min(100, (budget / maxVal) * 100);
+    const variance = actual - budget;
+    return `<div class="bva-row ${over ? 'bva-over' : 'bva-under'}">
+      <div class="bva-hd">
+        <span class="bva-cat">${cat}</span>
+        <span class="bva-nums">$${actual.toFixed(0)} actual · $${budget.toLocaleString()} budget</span>
+      </div>
+      <div class="bva-bar-bg">
+        <div class="bva-bar-budget" style="width:${pctBudget}%"></div>
+        <div class="bva-bar-actual" style="width:${pctActual}%;background:${CAT_COLOR[cat]||C.muted}"></div>
+      </div>
+      ${budget > 0 ? `<div class="bva-variance">${variance > 0 ? '+' : ''}$${Math.abs(variance).toFixed(0)} ${over ? 'over' : 'under'} budget</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ── Tracker charts ──────────────────────────────────────────────────────── */
+function renderTrackerCatChart() {
+  const catTotals = monthlyByCat();
+  const cats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
+  if (!cats.length) { destroyChart('trackerCat'); return; }
+  destroyChart('trackerCat');
+  charts['trackerCat'] = new Chart(document.getElementById('c-tracker-cat'), {
+    type: 'bar',
+    data: {
+      labels: cats,
+      datasets: [{
+        label: 'This Month ($)',
+        data: cats.map(c => catTotals[c]),
+        backgroundColor: cats.map(c => alpha(CAT_COLOR[c] || C.muted, .8))
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { callback: v => '$' + v.toLocaleString() } } }
+    }
+  });
+}
+
+function renderTrackerDailyChart() {
+  // Last 14 days
+  const labels = [], data = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    labels.push(String(d.getDate()) + '/' + String(d.getMonth()+1));
+    data.push(transactions.filter(t => t.date === ds).reduce((s,t) => s + t.amount, 0));
+  }
+  const dailyTarget = totalMonthlyDiscretionary() / daysInMonth();
+  destroyChart('trackerDaily');
+  charts['trackerDaily'] = new Chart(document.getElementById('c-tracker-daily'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Spent', data, backgroundColor: data.map(v => alpha(v > dailyTarget ? C.red : C.pink, .75)), borderRadius: 4 },
+        { label: 'Daily target', data: Array(14).fill(dailyTarget), type: 'line', borderColor: alpha(C.amber,.7), borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 11, font: { size: 11 } } } },
+      scales: { y: { ticks: { callback: v => '$' + v.toFixed(0) } } }
+    }
+  });
+}
+
+/* ── Dashboard tracker strip ─────────────────────────────────────────────── */
+function renderDashboardTrackerStrip() {
+  const today = sumToday();
+  const month = sumThisMonth();
+  const budgetTotal = totalMonthlyDiscretionary();
+  const remaining = budgetTotal - month;
+  set('dt-today', '$' + today.toFixed(2));
+  set('dt-month', '$' + month.toFixed(2));
+  set('dt-budget', '$' + budgetTotal.toLocaleString());
+  set('dt-remaining', (remaining >= 0 ? '$' : '−$') + Math.abs(remaining).toLocaleString());
+  const remEl = document.getElementById('dt-remaining');
+  if (remEl) remEl.style.color = remaining >= 0 ? C.green : C.red;
+  const monEl = document.getElementById('dt-month');
+  if (monEl) monEl.style.color = month > budgetTotal ? C.red : C.amber;
+}
+
+/* ── Navigation helper (used by "View tracker →" link) ──────────────────── */
+function navigate(sectionId) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const navItem = document.querySelector(`.nav-item[data-s="${sectionId}"]`);
+  if (navItem) navItem.classList.add('active');
+  const sec = document.getElementById(sectionId);
+  if (sec) { sec.classList.add('active'); renderTracker(); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   END TRACKER
+   ══════════════════════════════════════════════════════════════════════════ */
+
 /* ── Init ───────────────────────────────────────────────────────────────── */
 loadState();
+loadTxns();
 syncFieldsToData();
 render();
+// Set default date to today
+document.getElementById('qa-date').value = todayStr();
+// Render tracker totals on dashboard immediately
+renderDashboardTrackerStrip();
+// Render tracker section when its nav item is clicked
+document.querySelector('.nav-item[data-s="tracker"]').addEventListener('click', () => {
+  renderTracker();
+});
 </script>
 </body>
 </html>
