@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EricaFB — Finance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --bg:#0f172a; --surface:#1e293b; --surface2:#273349; --surface3:#1a2540;
+  --border:#334155; --text:#f1f5f9; --muted:#94a3b8; --muted2:#64748b;
+  --blue:#3b82f6; --blue-dim:rgba(59,130,246,.15);
+  --green:#10b981; --green-dim:rgba(16,185,129,.15);
+  --amber:#f59e0b; --amber-dim:rgba(245,158,11,.15);
+  --red:#ef4444; --red-dim:rgba(239,68,68,.15);
+  --purple:#a855f7; --purple-dim:rgba(168,85,247,.15);
+  --cyan:#06b6d4; --pink:#ec4899;
+  --sidebar-w:252px; --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;display:flex;min-height:100vh;font-size:14px}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+#sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;
+  display:flex;flex-direction:column;transition:transform .25s ease}
+.sb-header{padding:20px 18px 14px;border-bottom:1px solid var(--border)}
+.sb-logo{font-size:1.2rem;font-weight:800;color:var(--pink);letter-spacing:-.02em}
+.sb-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+.sb-pay-note{margin:8px 18px 0;padding:6px 10px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);border-radius:6px;font-size:.7rem;color:var(--cyan)}
+.sb-mode{margin:10px 18px 0;display:flex;gap:6px}
+.mode-btn{flex:1;padding:5px 0;border-radius:6px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.mode-btn.active{background:var(--amber);border-color:var(--amber);color:#000}
+.mode-btn:not(.active):hover{border-color:var(--amber);color:var(--amber)}
+nav{flex:1;padding:10px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;
+  color:var(--muted);font-size:.82rem;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--blue-dim);color:var(--blue);border-left-color:var(--blue)}
+.nav-icon{font-size:1rem;width:18px;text-align:center;flex-shrink:0}
+.sb-footer{padding:12px 18px;border-top:1px solid var(--border);font-size:.7rem;color:var(--muted2)}
+.sb-footer button{display:block;width:100%;margin-top:6px;padding:7px;border-radius:6px;
+  border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer;transition:all .15s}
+.sb-footer button:hover{border-color:var(--red);color:var(--red)}
+
+/* ── Main ────────────────────────────────────────────────────────────────── */
+#main{margin-left:var(--sidebar-w);flex:1;padding:28px;min-height:100vh;max-width:1400px}
+.section{display:none}.section.active{display:block}
+.pg-title{font-size:1.55rem;font-weight:700;margin-bottom:4px}
+.pg-sub{color:var(--muted);font-size:.82rem;margin-bottom:22px}
+
+/* ── Scenario banner ─────────────────────────────────────────────────────── */
+#scenario-banner{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);
+  border-radius:var(--radius);padding:10px 16px;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+#scenario-banner.hidden{display:none}
+.banner-left{display:flex;align-items:center;gap:10px;font-size:.8rem}
+.banner-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.banner-btns{display:flex;gap:8px;flex-shrink:0}
+.banner-btns button{padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-apply{background:var(--amber);color:#000}.btn-discard{background:var(--surface2);color:var(--muted)}
+.btn-apply:hover{background:#d97706}.btn-discard:hover{color:var(--text)}
+
+/* ── Cards & grids ───────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.card-grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}.g21{grid-template-columns:2fr 1fr}
+.mt3{margin-top:12px}.mt4{margin-top:16px}.mt6{margin-top:24px}
+
+/* ── KPI ─────────────────────────────────────────────────────────────────── */
+.kpi{border-left:4px solid var(--blue)}
+.kpi-green{border-left-color:var(--green)}.kpi-red{border-left-color:var(--red)}
+.kpi-amber{border-left-color:var(--amber)}.kpi-purple{border-left-color:var(--purple)}
+.kpi-pink{border-left-color:var(--pink)}
+.kpi-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.kpi-val{font-size:1.6rem;font-weight:700;line-height:1}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:5px}
+.kpi-scen{font-size:.72rem;margin-top:4px;font-weight:600}
+.kpi-scen.up{color:var(--green)}.kpi-scen.down{color:var(--red)}.kpi-scen.same{color:var(--muted)}
+.kpi-green .kpi-val{color:var(--green)}.kpi-red .kpi-val{color:var(--red)}
+.kpi-amber .kpi-val{color:var(--amber)}.kpi-purple .kpi-val{color:var(--purple)}
+.kpi-pink .kpi-val{color:var(--pink)}
+
+/* ── Fields ──────────────────────────────────────────────────────────────── */
+.field-group{margin-bottom:14px}
+.field-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.field-default{font-size:.68rem;color:var(--muted2);font-style:italic;text-transform:none;letter-spacing:0}
+.field-row{display:flex;align-items:center;gap:8px}
+.field-prefix{color:var(--muted);font-size:.9rem;font-weight:500}
+.num-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-size:.95rem;font-weight:600;padding:7px 10px;width:100%;transition:border-color .15s;font-family:inherit}
+.num-input:focus{outline:none;border-color:var(--blue)}
+.num-input.changed{border-color:var(--amber);background:rgba(245,158,11,.08)}
+.range-wrap{display:flex;align-items:center;gap:10px;margin-top:4px}
+input[type=range]{flex:1;accent-color:var(--blue);cursor:pointer}
+.range-val{font-size:.8rem;font-weight:600;min-width:36px;text-align:right;color:var(--amber)}
+
+/* ── Section header ──────────────────────────────────────────────────────── */
+.section-hd{font-size:.88rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.section-hd span{color:var(--muted);font-size:.72rem;font-weight:400}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);
+  color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+td{padding:8px 10px;border-bottom:1px solid rgba(51,65,85,.4);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tr-total td{font-weight:700;border-top:1px solid var(--border);padding-top:10px}
+.td-g{color:var(--green)}.td-r{color:var(--red)}.td-a{color:var(--amber)}
+.td-b{color:var(--blue)}.td-m{color:var(--muted)}.td-pk{color:var(--pink)}
+.tag{display:inline-block;padding:2px 7px;border-radius:9999px;font-size:.68rem;font-weight:600}
+.tag-h{background:rgba(59,130,246,.15);color:#93c5fd}
+.tag-l{background:rgba(168,85,247,.15);color:#d8b4fe}
+.tag-f{background:rgba(245,158,11,.15);color:#fde68a}
+.tag-p{background:rgba(6,182,212,.15);color:#67e8f9}
+.tag-s{background:rgba(16,185,129,.15);color:#6ee7b7}
+.tag-t{background:rgba(236,72,153,.15);color:#f9a8d4}
+
+/* ── Progress ────────────────────────────────────────────────────────────── */
+.prog-wrap{margin-bottom:18px}
+.prog-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;font-size:.82rem}
+.prog-bar{height:9px;background:var(--surface2);border-radius:9999px;overflow:hidden;position:relative}
+.prog-fill{height:100%;border-radius:9999px;transition:width .5s ease}
+.prog-scen{height:100%;border-radius:9999px;position:absolute;top:0;left:0;opacity:.45;transition:width .5s ease;background:var(--amber)}
+
+/* ── Charts ──────────────────────────────────────────────────────────────── */
+.chart-wrap{position:relative}.chart-wrap canvas{max-width:100%}
+
+/* ── Comparison ──────────────────────────────────────────────────────────── */
+.cmp-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.68rem;font-weight:700}
+.cmp-base{background:var(--blue-dim);color:var(--blue)}
+.cmp-scen{background:var(--amber-dim);color:var(--amber)}
+
+/* ── Insights ─────────────────────────────────────────────────────────────── */
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.insight{border-radius:var(--radius);padding:14px}
+.ins-risk{background:var(--red-dim);border:1px solid rgba(239,68,68,.25)}
+.ins-opp{background:var(--green-dim);border:1px solid rgba(16,185,129,.25)}
+.ins-pri{background:var(--blue-dim);border:1px solid rgba(59,130,246,.25)}
+.ins-badge{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.ins-risk .ins-badge{color:var(--red)}.ins-opp .ins-badge{color:var(--green)}.ins-pri .ins-badge{color:var(--blue)}
+.insight h3{font-size:.82rem;font-weight:600;margin-bottom:5px}
+.insight p{font-size:.75rem;color:var(--muted);line-height:1.55}
+
+/* ── Property card ───────────────────────────────────────────────────────── */
+.prop-metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(51,65,85,.4);font-size:.82rem}
+.prop-metric:last-child{border-bottom:none;font-weight:700;padding-top:10px}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Hamburger / mobile ──────────────────────────────────────────────────── */
+#ham{display:none;position:fixed;top:12px;left:12px;z-index:200;
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  padding:7px 9px;cursor:pointer;font-size:1.1rem}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90}
+
+@media(max-width:900px){
+  #ham{display:block}
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #overlay.open{display:block}
+  #main{margin-left:0;padding:14px;padding-top:52px}
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3,.g2,.g21{grid-template-columns:1fr}
+  .insight-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){.g4{grid-template-columns:1fr 1fr}.kpi-val{font-size:1.3rem}}
+</style>
+</head>
+<body>
+
+<button id="ham" onclick="toggleSidebar()">☰</button>
+<div id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">EricaFB</div>
+    <div class="sb-sub">Personal Finance · Interactive</div>
+  </div>
+  <div class="sb-pay-note">⏱ Pay cycle: fortnightly · All figures shown monthly</div>
+  <div class="sb-mode">
+    <button class="mode-btn active" id="btn-base" onclick="setMode('base')">Base</button>
+    <button class="mode-btn" id="btn-scen" onclick="setMode('scenario')">Scenario</button>
+  </div>
+  <nav id="nav">
+    <div class="nav-item active" data-s="dashboard"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" data-s="income"><span class="nav-icon">💰</span>Income</div>
+    <div class="nav-item" data-s="expenses"><span class="nav-icon">💸</span>Expenses</div>
+    <div class="nav-item" data-s="property"><span class="nav-icon">🏠</span>Property</div>
+    <div class="nav-item" data-s="savings"><span class="nav-icon">🎯</span>Savings</div>
+    <div class="nav-item" data-s="compare"><span class="nav-icon">⚖️</span>Comparison</div>
+    <div class="nav-item" data-s="summary"><span class="nav-icon">📋</span>Summary</div>
+  </nav>
+  <div class="sb-footer">
+    <div id="storage-status">Changes saved locally</div>
+    <button onclick="resetToDefaults()">↺ Reset to spreadsheet defaults</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════════════════ -->
+<main id="main">
+
+<div id="scenario-banner" class="hidden">
+  <div class="banner-left">
+    <div class="banner-dot"></div>
+    <strong style="color:var(--amber)">Scenario Mode</strong>
+    <span style="color:var(--muted)">— changes here won't affect your base values</span>
+  </div>
+  <div class="banner-btns">
+    <button class="btn-apply" onclick="applyScenario()">Apply to Base</button>
+    <button class="btn-discard" onclick="discardScenario()">Discard</button>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ──────────────────────────────────────────────────────────── -->
+<section id="dashboard" class="section active">
+  <div class="pg-title">Dashboard</div>
+  <div class="pg-sub">Apr 2026 snapshot · fortnightly pay, all figures normalised to monthly</div>
+
+  <div class="card-grid g4">
+    <div class="card kpi kpi-green">
+      <div class="kpi-label">Total Monthly Income</div>
+      <div class="kpi-val" id="d-income">$7,713</div>
+      <div class="kpi-sub" id="d-income-ann">$92,560 / year</div>
+      <div class="kpi-scen" id="d-income-scen"></div>
+    </div>
+    <div class="card kpi kpi-red">
+      <div class="kpi-label">Total Monthly Expenses</div>
+      <div class="kpi-val" id="d-expenses">$5,020</div>
+      <div class="kpi-sub" id="d-expenses-ann">excl. savings allocation</div>
+      <div class="kpi-scen" id="d-expenses-scen"></div>
+    </div>
+    <div class="card kpi kpi-amber">
+      <div class="kpi-label">Net Cash Flow</div>
+      <div class="kpi-val" id="d-net">+$2,693</div>
+      <div class="kpi-sub" id="d-savings-rate">34.9% savings rate</div>
+      <div class="kpi-scen" id="d-net-scen"></div>
+    </div>
+    <div class="card kpi kpi-pink">
+      <div class="kpi-label">Savings Balance</div>
+      <div class="kpi-val" id="d-savbal">$82,160</div>
+      <div class="kpi-sub">+$2,693/month</div>
+      <div class="kpi-scen" id="d-savbal-scen"></div>
+    </div>
+  </div>
+
+  <div class="card-grid g2 mt6">
+    <div class="card">
+      <div class="section-hd">Monthly Breakdown</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="c-dash-donut"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="section-hd">Income vs Expenses</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="c-dash-bar"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card-grid g3 mt4">
+    <div class="card" style="border-left:4px solid var(--amber)">
+      <div class="kpi-label">Housing &amp; Fixed Costs</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--amber)" id="d-housing">$2,200/mo</div>
+      <div class="kpi-sub">Mortgage + OC + bills + transport</div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--green)">
+      <div class="kpi-label">House Deposit ETA</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--green)" id="d-eta">Mar 2027</div>
+      <div class="kpi-sub">$140,000 deposit goal</div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--blue)">
+      <div class="kpi-label">Savings Rate</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--blue)" id="d-savrate">34.9%</div>
+      <div class="kpi-sub">% of gross income saved monthly</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INCOME ─────────────────────────────────────────────────────────────── -->
+<section id="income" class="section">
+  <div class="pg-title">Income</div>
+  <div class="pg-sub">Fortnightly pay cycle — all inputs and totals shown as monthly equivalents (×26÷12)</div>
+
+  <div class="card-grid g2">
+    <div class="card">
+      <div class="section-hd">Income Sources <span>edit to adjust</span></div>
+
+      <div class="field-group">
+        <div class="field-label">Salary (monthly equiv.) <span class="field-default">default $6,717 · $3,100 × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-salary" value="6717" min="0" step="100" onchange="onFieldChange(this,'salary')">
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="salary-fn-disp">$3,100</span> · Annual: <span id="salary-ann-disp">$80,600</span></div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Rental Income (monthly equiv.) <span class="field-default">default $997 · $460 × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-rentincome" value="997" min="0" step="50" onchange="onFieldChange(this,'rentIncome')">
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Fortnightly: <span id="rent-fn-disp">$460</span> · Annual: <span id="rent-ann-disp">$11,960</span></div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.82rem;font-weight:600">Total Monthly Income</div>
+        <div style="font-size:1.15rem;font-weight:700;color:var(--green)" id="inc-total">$7,713</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <div style="font-size:.82rem;color:var(--muted)">Annual equivalent</div>
+        <div style="font-size:.95rem;font-weight:600" id="inc-annual">$92,560</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-hd">Income Split</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-income-pie"></canvas></div>
+      <div class="divider"></div>
+      <table>
+        <thead><tr><th>Source</th><th>Monthly</th><th>Annual</th><th>Share</th></tr></thead>
+        <tbody id="income-table"></tbody>
+      </table>
+      <div style="margin-top:14px;padding:10px;background:rgba(6,182,212,.08);border-radius:8px;font-size:.75rem;color:var(--muted)">
+        <strong style="color:var(--cyan)">Note:</strong> Income includes $200/month superannuation contribution already deducted (take-home). Annual gross will be higher.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EXPENSES ───────────────────────────────────────────────────────────── -->
+<section id="expenses" class="section">
+  <div class="pg-title">Expenses</div>
+  <div class="pg-sub">All values monthly equivalent — edit any field to recalculate instantly</div>
+
+  <div class="card-grid g2">
+    <!-- Left column -->
+    <div class="card">
+      <div class="section-hd">Housing &amp; Fixed <span style="color:var(--blue)" id="exp-housing-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Mortgage <span class="field-default">default $1,907 · $880 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-mortgage" value="1907" min="0" step="50" onchange="onFieldChange(this,'mortgage')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Owner Corp (OC) Fee <span class="field-default">default $433 · $200 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-oc" value="433" min="0" step="10" onchange="onFieldChange(this,'oc')">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Bills &amp; Utilities <span style="color:var(--purple)" id="exp-bills-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Electricity <span class="field-default">default $87 · $80/mo × 13÷12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-electricity" value="87" min="0" step="5" onchange="onFieldChange(this,'electricity')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Water <span class="field-default">default $87 · $80/mo</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-water" value="80" min="0" step="5" onchange="onFieldChange(this,'water')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Hot Water <span class="field-default">default $60</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-hotwater" value="60" min="0" step="5" onchange="onFieldChange(this,'hotWater')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Internet <span class="field-default">default $50</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-internet" value="50" min="0" step="5" onchange="onFieldChange(this,'internet')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Netflix <span class="field-default">default $8 · $3.50 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-netflix" value="8" min="0" step="1" onchange="onFieldChange(this,'netflix')">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Transport &amp; Insurance <span style="color:var(--cyan)" id="exp-transport-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Transport <span class="field-default">default $238 · $110 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-transport" value="238" min="0" step="10" onchange="onFieldChange(this,'transport')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Health Insurance <span class="field-default">default $108 · $50 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-healthins" value="108" min="0" step="5" onchange="onFieldChange(this,'healthIns')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Car Insurance &amp; Rego <span class="field-default">default $271 · $125 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-carins" value="271" min="0" step="5" onchange="onFieldChange(this,'carIns')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">AASW Membership <span class="field-default">default $108 · $50 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-aasw" value="108" min="0" step="5" onchange="onFieldChange(this,'aasw')">
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="card">
+      <div class="section-hd">Food <span style="color:var(--amber)" id="exp-food-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Grocery <span class="field-default">default $325 · $150 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-grocery" value="325" min="0" step="10" onchange="onFieldChange(this,'grocery')">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Personal / Lifestyle <span style="color:var(--pink)" id="exp-personal-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Dating / Entertainment <span class="field-default">default $271 · $125 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-dating" value="271" min="0" step="25" onchange="onFieldChange(this,'dating')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Gym <span class="field-default">default $37 · $17 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-gym" value="37" min="0" step="5" onchange="onFieldChange(this,'gym')">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Discretionary <span style="color:var(--purple)" id="exp-disc-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Celebrations / Gifts <span class="field-default">default $152 · $70 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-celebrations" value="152" min="0" step="10" onchange="onFieldChange(this,'celebrations')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Travel <span class="field-default">default $867 · $400 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-travel" value="867" min="0" step="50" onchange="onFieldChange(this,'travel')">
+        </div>
+        <div class="range-wrap">
+          <span style="font-size:.72rem;color:var(--muted)">$0</span>
+          <input type="range" id="f-travel-range" min="0" max="2000" value="867" step="50" oninput="syncRangeToInput('f-travel-range','f-travel','travel')">
+          <span style="font-size:.72rem;color:var(--muted)">$2k</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Savings Allocation <span style="color:var(--green)" id="exp-sav-total"></span></div>
+
+      <div class="field-group">
+        <div class="field-label">Monthly Savings Contribution <span class="field-default">default $2,693 · $1,244.50 fn × 26 ÷ 12</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-savingsmo" value="2693" min="0" step="100" onchange="onFieldChange(this,'savingsMo')">
+        </div>
+        <div class="range-wrap">
+          <span style="font-size:.72rem;color:var(--muted)">$0</span>
+          <input type="range" id="f-savingsmo-range" min="0" max="6000" value="2693" step="50" oninput="syncRangeToInput('f-savingsmo-range','f-savingsmo','savingsMo')">
+          <span style="font-size:.72rem;color:var(--muted)">$6k</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.82rem;font-weight:600">Total Monthly Expenses</div>
+        <div style="font-size:1.15rem;font-weight:700;color:var(--red)" id="exp-total">$5,020</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div style="font-size:.82rem;color:var(--muted)">Free Cash (Remaining)</div>
+        <div style="font-size:1.05rem;font-weight:600;color:var(--amber)" id="exp-remaining">+$0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Expense Breakdown</div>
+    <div class="chart-wrap" style="height:280px"><canvas id="c-exp-bar"></canvas></div>
+  </div>
+</section>
+
+<!-- ── PROPERTY ───────────────────────────────────────────────────────────── -->
+<section id="property" class="section">
+  <div class="pg-title">Property</div>
+  <div class="pg-sub">Single investment property — rental income offset against mortgage and owner corp fee</div>
+
+  <div class="card-grid g2">
+    <div class="card" style="border-top:3px solid var(--pink)">
+      <div class="section-hd" style="color:var(--pink)">Investment Property</div>
+      <div class="prop-metric"><span>Rental Income</span><span class="td-g" id="p-rent">$997/mo</span></div>
+      <div class="prop-metric"><span>Mortgage</span><span class="td-r" id="p-mort">−$1,907/mo</span></div>
+      <div class="prop-metric"><span>Owner Corp Fee</span><span class="td-r" id="p-oc">−$433/mo</span></div>
+      <div class="prop-metric"><span>Net Monthly Cash Flow</span><span id="p-net" style="font-weight:700">−$1,343/mo</span></div>
+      <div class="divider"></div>
+      <div style="font-size:.75rem;color:var(--muted)">
+        Mortgage covers principal + interest. Negative gearing and tax return benefits likely apply — confirm with accountant.
+        The property builds equity over time even while cash-flow negative.
+      </div>
+    </div>
+
+    <div class="card" style="border-top:3px solid var(--blue)">
+      <div class="section-hd" style="color:var(--blue)">Property Context</div>
+      <div class="card-grid g2" style="gap:12px">
+        <div><div class="kpi-label">Gross Rental Yield</div><div style="font-size:1rem;font-weight:700;color:var(--green)" id="p-yield">—</div></div>
+        <div><div class="kpi-label">Rental Cover Ratio</div><div style="font-size:1rem;font-weight:700;color:var(--amber)" id="p-cover">52%</div></div>
+        <div><div class="kpi-label">Monthly Shortfall</div><div style="font-size:1rem;font-weight:700;color:var(--red)" id="p-shortfall">$1,343</div></div>
+        <div><div class="kpi-label">Annual Shortfall</div><div style="font-size:1rem;font-weight:700;color:var(--red)" id="p-shortfall-ann">$16,116</div></div>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:.75rem;color:var(--muted);line-height:1.6">
+        <strong style="color:var(--text)">Rental income label:</strong> Spreadsheet shows $460 per fortnight ($11,960/year) from one property.<br>
+        <strong style="color:var(--text)">OC fee:</strong> $200/fortnight ($5,200/year) owner corporation / strata fee.<br>
+        <strong style="color:var(--text)">Tip:</strong> A 10% rent increase (+$100/mo) would reduce monthly shortfall to ~$1,243.
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Property Cash Flow Chart</div>
+    <div class="chart-wrap" style="height:240px"><canvas id="c-prop-bar"></canvas></div>
+  </div>
+</section>
+
+<!-- ── SAVINGS ─────────────────────────────────────────────────────────────── -->
+<section id="savings" class="section">
+  <div class="pg-title">Savings Goals</div>
+  <div class="pg-sub">Edit balance, contribution and targets — ETA dates recalculate automatically</div>
+
+  <div class="card-grid g4">
+    <div class="card kpi kpi-pink">
+      <div class="kpi-label">Current Balance</div>
+      <div class="kpi-val" id="sv-bal">$82,160</div>
+      <div class="kpi-sub">Apr 2026 snapshot</div>
+    </div>
+    <div class="card kpi kpi-green">
+      <div class="kpi-label">Monthly Contribution</div>
+      <div class="kpi-val" id="sv-contrib">$2,693</div>
+      <div class="kpi-sub">$1,244.50/fortnight</div>
+    </div>
+    <div class="card kpi kpi-amber">
+      <div class="kpi-label">House Deposit ETA</div>
+      <div class="kpi-val" id="sv-deposit-eta">Mar 2027</div>
+      <div class="kpi-sub">$140k goal</div>
+    </div>
+    <div class="card kpi kpi-blue" style="border-left:4px solid var(--blue)">
+      <div class="kpi-label">Emergency Fund ETA</div>
+      <div class="kpi-val" id="sv-emergency-eta">Reached ✓</div>
+      <div class="kpi-sub">$50k goal</div>
+    </div>
+  </div>
+
+  <div class="card-grid g2 mt4">
+    <div class="card">
+      <div class="section-hd">Edit Starting Position</div>
+
+      <div class="field-group">
+        <div class="field-label">Current Savings Balance <span class="field-default">default $82,160</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-savbal" value="82160" min="0" step="1000" onchange="onFieldChange(this,'savBal')">
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);margin-top:4px">
+        Monthly contribution: <strong id="sav-contrib-disp" style="color:var(--green)">$2,693</strong> (set in Expenses tab)
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-hd">Savings Targets</div>
+
+      <div class="field-group">
+        <div class="field-label">House Deposit Goal <span class="field-default">default $140,000 (from spreadsheet)</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-goal-deposit" value="140000" min="0" step="5000" onchange="onFieldChange(this,'goalDeposit')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Emergency Fund Goal <span class="field-default">default $50,000</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-goal-emergency" value="50000" min="0" step="5000" onchange="onFieldChange(this,'goalEmergency')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Long-term Wealth Goal <span class="field-default">default $300,000</span></div>
+        <div class="field-row"><span class="field-prefix">$</span>
+          <input class="num-input" type="number" id="f-goal-wealth" value="300000" min="0" step="10000" onchange="onFieldChange(this,'goalWealth')">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-hd">Goal Progress</div>
+      <div id="goals-progress"></div>
+    </div>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Savings Forecast (monthly steps)</div>
+    <div class="chart-wrap" style="height:300px"><canvas id="c-savings-line"></canvas></div>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Forecast Table</div>
+    <table>
+      <thead><tr><th>Date</th><th>Projected Balance</th><th>vs Deposit Goal</th><th>Milestone</th></tr></thead>
+      <tbody id="forecast-table"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── COMPARISON ─────────────────────────────────────────────────────────── -->
+<section id="compare" class="section">
+  <div class="pg-title">Base vs Scenario Comparison</div>
+  <div class="pg-sub">Side-by-side of base values and current scenario</div>
+
+  <div class="card-grid g4">
+    <div class="card kpi kpi-green">
+      <div class="kpi-label">Income — Base</div>
+      <div class="kpi-val td-g" id="cmp-inc-base">$7,713</div>
+    </div>
+    <div class="card kpi kpi-amber">
+      <div class="kpi-label">Income — Scenario</div>
+      <div class="kpi-val" style="color:var(--amber)" id="cmp-inc-scen">$7,713</div>
+    </div>
+    <div class="card kpi kpi-red">
+      <div class="kpi-label">Expenses — Base</div>
+      <div class="kpi-val td-r" id="cmp-exp-base">$5,020</div>
+    </div>
+    <div class="card kpi kpi-amber">
+      <div class="kpi-label">Expenses — Scenario</div>
+      <div class="kpi-val" style="color:var(--amber)" id="cmp-exp-scen">$5,020</div>
+    </div>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Line-by-line Comparison</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th><span class="cmp-badge cmp-base">Base</span></th>
+          <th><span class="cmp-badge cmp-scen">Scenario</span></th>
+          <th>Δ Change</th>
+        </tr>
+      </thead>
+      <tbody id="cmp-table"></tbody>
+    </table>
+  </div>
+
+  <div class="card mt4">
+    <div class="section-hd">Net Cash Flow Comparison</div>
+    <div class="chart-wrap" style="height:240px"><canvas id="c-cmp-bar"></canvas></div>
+  </div>
+</section>
+
+<!-- ── SUMMARY ────────────────────────────────────────────────────────────── -->
+<section id="summary" class="section">
+  <div class="pg-title">Executive Summary</div>
+  <div class="pg-sub">Dynamic insights based on current figures</div>
+
+  <div class="card-grid g3">
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="section-hd" style="color:var(--green)">Key Metrics</div>
+      <table><tbody id="summary-metrics"></tbody></table>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div class="section-hd" style="color:var(--amber)">Savings Milestones</div>
+      <div id="summary-timeline" style="font-size:.82rem;line-height:2.2"></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--pink)">
+      <div class="section-hd" style="color:var(--pink)">Income Split</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-sum-pie"></canvas></div>
+    </div>
+  </div>
+
+  <div class="insight-grid mt6" id="insights"></div>
+</section>
+
+</main>
+
+<script>
+/* ── Spreadsheet defaults (all monthly) ────────────────────────────────── */
+// Fortnightly → monthly = value × 26 ÷ 12
+// Income: $3,100 fn salary, $460 fn rent → monthly
+const DEFAULTS = {
+  salary: 6717,       // 3100 * 26 / 12
+  rentIncome: 997,    // 460  * 26 / 12
+  mortgage: 1907,     // 880  * 26 / 12
+  oc: 433,            // 200  * 26 / 12
+  electricity: 87,    // ~80/mo
+  water: 80,
+  hotWater: 60,
+  internet: 50,
+  netflix: 8,         // 3.5  * 26 / 12
+  transport: 238,     // 110  * 26 / 12
+  healthIns: 108,     // 50   * 26 / 12
+  carIns: 271,        // 125  * 26 / 12
+  aasw: 108,          // 50   * 26 / 12 (professional membership)
+  grocery: 325,       // 150  * 26 / 12
+  dating: 271,        // 125  * 26 / 12
+  gym: 37,            // 17   * 26 / 12
+  celebrations: 152,  // 70   * 26 / 12
+  travel: 867,        // 400  * 26 / 12
+  savingsMo: 2693,    // 1244.5 * 26 / 12
+  savBal: 82160,      // balance at Apr 2026 (12 Apr 2026 row in saving sheet)
+  goalDeposit: 140000,
+  goalEmergency: 50000,
+  goalWealth: 300000
+};
+
+const FIELD_MAP = {
+  salary:'f-salary', rentIncome:'f-rentincome',
+  mortgage:'f-mortgage', oc:'f-oc',
+  electricity:'f-electricity', water:'f-water', hotWater:'f-hotwater',
+  internet:'f-internet', netflix:'f-netflix',
+  transport:'f-transport', healthIns:'f-healthins', carIns:'f-carins', aasw:'f-aasw',
+  grocery:'f-grocery', dating:'f-dating', gym:'f-gym',
+  celebrations:'f-celebrations', travel:'f-travel',
+  savingsMo:'f-savingsmo', savBal:'f-savbal',
+  goalDeposit:'f-goal-deposit', goalEmergency:'f-goal-emergency', goalWealth:'f-goal-wealth'
+};
+
+/* ── State ──────────────────────────────────────────────────────────────── */
+let mode = 'base';
+let baseData = Object.assign({}, DEFAULTS);
+let scenarioData = Object.assign({}, DEFAULTS);
+
+/* ── LocalStorage ───────────────────────────────────────────────────────── */
+const LS_BASE = 'ericafb_base_v1';
+const LS_SCEN = 'ericafb_scen_v1';
+
+function saveState() {
+  try {
+    localStorage.setItem(LS_BASE, JSON.stringify(baseData));
+    localStorage.setItem(LS_SCEN, JSON.stringify(scenarioData));
+    document.getElementById('storage-status').textContent = 'Saved ' + new Date().toLocaleTimeString();
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const b = localStorage.getItem(LS_BASE);
+    const s = localStorage.getItem(LS_SCEN);
+    if (b) baseData = Object.assign({}, DEFAULTS, JSON.parse(b));
+    if (s) scenarioData = Object.assign({}, DEFAULTS, JSON.parse(s));
+  } catch(e) {}
+}
+
+/* ── Derived calculations ───────────────────────────────────────────────── */
+function calc(d) {
+  const totalIncome = d.salary + d.rentIncome;
+  const housing = d.mortgage + d.oc;
+  const bills = d.electricity + d.water + d.hotWater + d.internet + d.netflix;
+  const transport = d.transport + d.healthIns + d.carIns + d.aasw;
+  const food = d.grocery;
+  const personal = d.dating + d.gym;
+  const discretionary = d.celebrations + d.travel;
+  const totalExpenses = housing + bills + transport + food + personal + discretionary + d.savingsMo;
+  const net = totalIncome - totalExpenses;
+  const free = totalIncome - (totalExpenses - d.savingsMo) - d.savingsMo; // truly free after savings
+  const savingsRate = totalIncome > 0 ? d.savingsMo / totalIncome : 0;
+  const propertyNet = d.rentIncome - d.mortgage - d.oc;
+  const rentalCoverRatio = (d.mortgage + d.oc) > 0 ? d.rentIncome / (d.mortgage + d.oc) : 0;
+  return { totalIncome, housing, bills, transport, food, personal, discretionary,
+           totalExpenses, net, free, savingsRate, propertyNet, rentalCoverRatio };
+}
+
+/* ── Forecast helpers ───────────────────────────────────────────────────── */
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function etaLabel(currentBal, goal, monthlyContrib) {
+  if (currentBal >= goal) return 'Reached ✓';
+  if (monthlyContrib <= 0) return 'N/A';
+  const months = Math.ceil((goal - currentBal) / monthlyContrib);
+  const d = new Date(2026, 3, 1); // Apr 2026
+  d.setMonth(d.getMonth() + months);
+  return MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function etaMonths(currentBal, goal, monthlyContrib) {
+  if (currentBal >= goal || monthlyContrib <= 0) return 0;
+  return Math.ceil((goal - currentBal) / monthlyContrib);
+}
+
+function buildForecast(d, numMonths) {
+  const rows = [];
+  let bal = d.savBal;
+  const start = new Date(2026, 3, 1); // Apr 2026
+  for (let i = 0; i < numMonths; i++) {
+    const dt = new Date(start);
+    dt.setMonth(start.getMonth() + i);
+    if (i > 0) bal += d.savingsMo;
+    rows.push({
+      label: MONTHS[dt.getMonth()] + " '" + String(dt.getFullYear()).slice(2),
+      bal: Math.round(bal),
+      year: dt.getFullYear(),
+      month: dt.getMonth()
+    });
+  }
+  return rows;
+}
+
+/* ── Chart registry ─────────────────────────────────────────────────────── */
+const charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = '#334155';
+Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size = 12;
+
+const C = { blue:'#3b82f6', green:'#10b981', amber:'#f59e0b', red:'#ef4444',
+            purple:'#a855f7', cyan:'#06b6d4', pink:'#ec4899' };
+function alpha(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ── Format ─────────────────────────────────────────────────────────────── */
+const fmt = n => '$' + Math.round(Math.abs(n)).toLocaleString();
+const fmtS = n => (n >= 0 ? '+' : '−') + '$' + Math.round(Math.abs(n)).toLocaleString();
+
+/* ── Main render ────────────────────────────────────────────────────────── */
+function render() {
+  const active = mode === 'base' ? baseData : scenarioData;
+  const cv = calc(active);
+  const bv = calc(baseData);
+  const sv = calc(scenarioData);
+
+  // ── Dashboard ──
+  set('d-income', fmt(cv.totalIncome));
+  set('d-income-ann', fmt(cv.totalIncome * 12) + ' / year');
+  set('d-expenses', fmt(cv.totalExpenses - active.savingsMo));
+  set('d-expenses-ann', 'excl. savings allocation');
+  set('d-net', fmtS(active.savingsMo));
+  set('d-savings-rate', (cv.savingsRate * 100).toFixed(1) + '% savings rate');
+  set('d-savbal', fmt(active.savBal));
+  set('d-housing', fmt(cv.housing + cv.bills + cv.transport) + '/mo');
+  set('d-savrate', (cv.savingsRate * 100).toFixed(1) + '%');
+  set('d-eta', etaLabel(active.savBal, active.goalDeposit, active.savingsMo));
+
+  renderScenDelta('d-income-scen', sv.totalIncome - bv.totalIncome, false);
+  renderScenDelta('d-expenses-scen', sv.totalExpenses - bv.totalExpenses, true);
+  renderScenDelta('d-net-scen', sv.net - bv.net, false);
+  renderScenDelta('d-savbal-scen', scenarioData.savBal - baseData.savBal, false);
+
+  // ── Income ──
+  const salaryFn = Math.round(active.salary * 12 / 26);
+  const rentFn = Math.round(active.rentIncome * 12 / 26);
+  set('salary-fn-disp', '$' + salaryFn.toLocaleString());
+  set('salary-ann-disp', '$' + (salaryFn * 26).toLocaleString());
+  set('rent-fn-disp', '$' + rentFn.toLocaleString());
+  set('rent-ann-disp', '$' + (rentFn * 26).toLocaleString());
+  set('inc-total', fmt(cv.totalIncome));
+  set('inc-annual', fmt(cv.totalIncome * 12));
+  renderIncomeTable(active, cv);
+  renderChartIncomePie(active);
+
+  // ── Expenses ──
+  set('exp-housing-total', fmt(cv.housing));
+  set('exp-bills-total', fmt(cv.bills));
+  set('exp-transport-total', fmt(cv.transport));
+  set('exp-food-total', fmt(cv.food));
+  set('exp-personal-total', fmt(cv.personal));
+  set('exp-disc-total', fmt(cv.discretionary));
+  set('exp-sav-total', fmt(active.savingsMo));
+  set('exp-total', fmt(cv.totalExpenses - active.savingsMo));
+  const remaining = cv.net;
+  set('exp-remaining', fmtS(remaining));
+  document.getElementById('exp-remaining').style.color = remaining >= 0 ? C.green : C.red;
+  document.getElementById('f-travel-range').value = active.travel;
+  document.getElementById('f-savingsmo-range').value = active.savingsMo;
+  renderChartExpBar(active);
+
+  // ── Property ──
+  set('p-rent', fmt(active.rentIncome) + '/mo');
+  set('p-mort', '−' + fmt(active.mortgage) + '/mo');
+  set('p-oc', '−' + fmt(active.oc) + '/mo');
+  set('p-net', (cv.propertyNet >= 0 ? '+' : '−') + fmt(cv.propertyNet) + '/mo');
+  document.getElementById('p-net').style.color = cv.propertyNet >= 0 ? C.green : C.red;
+  set('p-cover', Math.round(cv.rentalCoverRatio * 100) + '%');
+  document.getElementById('p-cover').style.color = cv.rentalCoverRatio >= 0.7 ? C.green : cv.rentalCoverRatio >= 0.5 ? C.amber : C.red;
+  const shortfall = Math.max(0, -cv.propertyNet);
+  set('p-shortfall', fmt(shortfall));
+  set('p-shortfall-ann', fmt(shortfall * 12));
+  // Yield requires property value — show N/A without it
+  set('p-yield', 'Enter prop. value');
+  renderChartPropBar(active, cv);
+
+  // ── Savings ──
+  set('sv-bal', fmt(active.savBal));
+  set('sv-contrib', fmt(active.savingsMo));
+  set('sv-deposit-eta', etaLabel(active.savBal, active.goalDeposit, active.savingsMo));
+  set('sv-emergency-eta', etaLabel(active.savBal, active.goalEmergency, active.savingsMo));
+  set('sav-contrib-disp', fmt(active.savingsMo));
+  renderGoalsProgress(active);
+  renderSavingsForecast(active);
+  renderForecastTable(active);
+
+  // ── Comparison ──
+  set('cmp-inc-base', fmt(bv.totalIncome));
+  set('cmp-inc-scen', fmt(sv.totalIncome));
+  set('cmp-exp-base', fmt(bv.totalExpenses));
+  set('cmp-exp-scen', fmt(sv.totalExpenses));
+  renderCmpTable(baseData, scenarioData, bv, sv);
+  renderChartCmp(bv, sv);
+
+  // ── Dashboard charts ──
+  renderChartDashDonut(active, cv);
+  renderChartDashBar(active, cv);
+
+  // ── Summary ──
+  renderSummary(active, cv, bv);
+  renderInsights(active, cv);
+
+  highlightChangedFields();
+}
+
+function set(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+
+function renderScenDelta(id, delta, invertSign) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (JSON.stringify(baseData) === JSON.stringify(scenarioData) || delta === 0) { el.textContent = ''; return; }
+  const good = invertSign ? delta < 0 : delta > 0;
+  el.className = 'kpi-scen ' + (good ? 'up' : 'down');
+  el.textContent = 'Scenario: ' + fmtS(delta);
+}
+
+function highlightChangedFields() {
+  const active = mode === 'base' ? baseData : scenarioData;
+  Object.keys(FIELD_MAP).forEach(key => {
+    const el = document.getElementById(FIELD_MAP[key]);
+    if (el && el.tagName === 'INPUT') el.classList.toggle('changed', active[key] !== DEFAULTS[key]);
+  });
+}
+
+/* ── Income table ───────────────────────────────────────────────────────── */
+function renderIncomeTable(d, cv) {
+  const rows = [
+    ['Salary', d.salary, d.salary * 12, d.salary / cv.totalIncome],
+    ['Rental Income', d.rentIncome, d.rentIncome * 12, d.rentIncome / cv.totalIncome],
+    ['Total', cv.totalIncome, cv.totalIncome * 12, 1],
+  ];
+  document.getElementById('income-table').innerHTML = rows.map((r, i) => {
+    const isTotal = i === rows.length - 1;
+    return `<tr class="${isTotal ? 'tr-total' : ''}">
+      <td>${r[0]}</td>
+      <td class="${isTotal ? 'td-g' : ''}">${fmt(r[1])}</td>
+      <td>${fmt(r[2])}</td>
+      <td class="td-m">${(r[3] * 100).toFixed(1)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Goals progress ─────────────────────────────────────────────────────── */
+function renderGoalsProgress(d) {
+  const goals = [
+    { name: 'Emergency Fund', target: d.goalEmergency, color: C.green },
+    { name: 'House Deposit', target: d.goalDeposit, color: C.pink },
+    { name: 'Long-term Wealth', target: d.goalWealth, color: C.purple },
+  ];
+  const bPcts = goals.map(g => Math.min(100, (baseData.savBal / g.target) * 100));
+  const sPcts = goals.map(g => Math.min(100, (scenarioData.savBal / g.target) * 100));
+  const hasDelta = baseData.savBal !== scenarioData.savBal || baseData.savingsMo !== scenarioData.savingsMo;
+
+  document.getElementById('goals-progress').innerHTML = goals.map((g, i) => {
+    const pct = Math.min(100, (d.savBal / g.target) * 100);
+    const eta = etaLabel(d.savBal, g.target, d.savingsMo);
+    return `<div class="prog-wrap">
+      <div class="prog-hd">
+        <span>${g.name}</span>
+        <span style="color:var(--muted);font-size:.72rem">${fmt(d.savBal)} / ${fmt(g.target)} · <span style="color:${d.savBal >= g.target ? C.green : C.amber}">${eta}</span></span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:${pct}%;background:${g.color}"></div>
+        ${hasDelta ? `<div class="prog-scen" style="width:${sPcts[i]}%"></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Forecast table ─────────────────────────────────────────────────────── */
+function renderForecastTable(d) {
+  const rows = buildForecast(d, 24);
+  const depositMonth = etaMonths(d.savBal, d.goalDeposit, d.savingsMo);
+  const wealthMonth = etaMonths(d.savBal, d.goalWealth, d.savingsMo);
+  const milestones = {};
+  if (depositMonth > 0 && depositMonth < 24) milestones[depositMonth] = '🏠 House Deposit ' + fmt(d.goalDeposit);
+  if (wealthMonth > 0 && wealthMonth < 24) milestones[wealthMonth] = '📈 Wealth Goal ' + fmt(d.goalWealth);
+
+  document.getElementById('forecast-table').innerHTML = rows.map((r, i) => {
+    const gap = r.bal - d.goalDeposit;
+    const gapStr = gap >= 0 ? `<span class="td-g">+${fmt(gap)}</span>` : `<span class="td-r">−${fmt(-gap)}</span>`;
+    const ms = milestones[i] || '';
+    return `<tr>
+      <td>${r.label}</td>
+      <td class="td-b">${fmt(r.bal)}</td>
+      <td>${gapStr}</td>
+      <td style="color:var(--green);font-size:.75rem;font-weight:600">${ms}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Summary ────────────────────────────────────────────────────────────── */
+function renderSummary(d, cv, bv) {
+  const metrics = [
+    ['Monthly Income', fmt(cv.totalIncome), 'td-g'],
+    ['Monthly Expenses (ex. savings)', fmt(cv.totalExpenses - d.savingsMo), 'td-r'],
+    ['Savings/month', fmt(d.savingsMo), 'td-b'],
+    ['Savings Rate', (cv.savingsRate * 100).toFixed(1) + '%', ''],
+    ['Housing Cost Ratio', ((cv.housing / cv.totalIncome) * 100).toFixed(1) + '%', 'td-a'],
+    ['Property Net/mo', fmtS(cv.propertyNet), cv.propertyNet >= 0 ? 'td-g' : 'td-r'],
+  ];
+  document.getElementById('summary-metrics').innerHTML = metrics.map(r =>
+    `<tr><td style="padding:6px 0">${r[0]}</td><td style="text-align:right;font-weight:600" class="${r[2]}">${r[1]}</td></tr>`
+  ).join('');
+
+  document.getElementById('summary-timeline').innerHTML = [
+    `📍 Apr 2026: <strong>${fmt(d.savBal)}</strong> (today)`,
+    `📈 Apr 2027: <strong>${fmt(d.savBal + d.savingsMo * 12)}</strong>`,
+    `🏠 ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}: <strong>${fmt(d.goalDeposit)}</strong> — House Deposit`,
+    `📈 ${etaLabel(d.savBal, d.goalWealth, d.savingsMo)}: <strong>${fmt(d.goalWealth)}</strong> — Wealth Goal`,
+  ].map(s => `<div>${s}</div>`).join('');
+
+  renderChartSumPie(d);
+}
+
+/* ── Insights ───────────────────────────────────────────────────────────── */
+function renderInsights(d, cv) {
+  const housingRatio = cv.housing / cv.totalIncome;
+  const travelRatio = d.travel / cv.totalIncome;
+
+  const risks = [
+    {
+      title: 'Negative Property Cash Flow',
+      body: `Property runs at ${fmtS(cv.propertyNet)}/mo. The ${(cv.rentalCoverRatio*100).toFixed(0)}% rental cover ratio means salary subsidises the property. A vacancy or rent reduction would worsen this.`
+    },
+    {
+      title: 'Single Income Dependency',
+      body: `100% of earned income is from one employer ($${d.salary.toLocaleString()}/mo salary). No bonus buffer exists. Loss of employment would cut income by ${((d.salary/cv.totalIncome)*100).toFixed(0)}% almost immediately.`
+    },
+    {
+      title: travelRatio > 0.1 ? 'High Travel Allocation' : 'Discretionary Exposure',
+      body: travelRatio > 0.1
+        ? `Travel costs ${fmt(d.travel)}/mo (${(travelRatio*100).toFixed(1)}% of income). This is the largest discretionary line. Reducing to $500/mo saves ${fmt(d.travel - 500)}/mo.`
+        : `Celebrations + travel + dating = ${fmt(d.celebrations + d.travel + d.dating)}/mo. Manageable but worth monitoring against deposit timeline.`
+    }
+  ];
+
+  const opps = [
+    {
+      title: 'Strong Savings Rate',
+      body: `${(cv.savingsRate * 100).toFixed(1)}% savings rate is well above typical 10–15% guidance. At this rate, the house deposit goal of ${fmt(d.goalDeposit)} is reached ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}.`
+    },
+    {
+      title: 'Rent Increase Upside',
+      body: `A 10% rent increase (+${fmt(d.rentIncome * 0.1)}/mo) lifts monthly net income by the same and cuts property shortfall from ${fmt(-cv.propertyNet)} to ${fmt(-(cv.propertyNet - d.rentIncome * 0.1))}/mo.`
+    },
+    {
+      title: 'Travel Budget Flexibility',
+      body: `If travel drops from ${fmt(d.travel)} to ${fmt(d.travel * 0.6)}/mo, an extra ${fmt(d.travel * 0.4)} could redirect to savings — accelerating the deposit goal by ~${Math.ceil((d.goalDeposit - d.savBal) / (d.savingsMo + d.travel * 0.4)) - etaMonths(d.savBal, d.goalDeposit, d.savingsMo)} months.`
+    }
+  ];
+
+  const pris = [
+    {
+      title: 'Protect the Deposit Timeline',
+      body: `Current trajectory hits ${fmt(d.goalDeposit)} by ${etaLabel(d.savBal, d.goalDeposit, d.savingsMo)}. Avoid one-off drawdowns on savings unless absolutely necessary.`
+    },
+    {
+      title: 'Review AASW & Insurance',
+      body: `AASW ($${d.aasw.toLocaleString()}/mo) + health ($${d.healthIns.toLocaleString()}/mo) + car ins ($${d.carIns.toLocaleString()}/mo) = ${fmt(d.aasw+d.healthIns+d.carIns)}/mo. Annual review for better deals could save ~$500–$1k/year.`
+    },
+    {
+      title: 'Confirm Property Tax Benefits',
+      body: 'Negative gearing likely applies to the investment property. An accountant should confirm the annual tax return amount — this could add meaningfully to effective savings.'
+    }
+  ];
+
+  const cards = (arr, cls, badge) => arr.map(i =>
+    `<div class="insight ${cls}"><div class="ins-badge">${badge}</div><h3>${i.title}</h3><p>${i.body}</p></div>`
+  ).join('');
+  document.getElementById('insights').innerHTML =
+    cards(risks,'ins-risk','⚠ Risk') + cards(opps,'ins-opp','💡 Opportunity') + cards(pris,'ins-pri','🎯 Priority');
+}
+
+/* ── Comparison table ───────────────────────────────────────────────────── */
+function renderCmpTable(base, scen, bv, sv) {
+  const rows = [
+    { label:'Salary', bk:'salary', sk:'salary' },
+    { label:'Rental Income', bk:'rentIncome', sk:'rentIncome' },
+    { label:'Total Income', bv:Math.round(bv.totalIncome), sv:Math.round(sv.totalIncome), bold:true },
+    { label:'Mortgage', bk:'mortgage', sk:'mortgage' },
+    { label:'Owner Corp Fee', bk:'oc', sk:'oc' },
+    { label:'Bills & Utilities', bv:base.electricity+base.water+base.hotWater+base.internet+base.netflix, sv:scen.electricity+scen.water+scen.hotWater+scen.internet+scen.netflix },
+    { label:'Transport & Ins.', bv:base.transport+base.healthIns+base.carIns+base.aasw, sv:scen.transport+scen.healthIns+scen.carIns+scen.aasw },
+    { label:'Grocery', bk:'grocery', sk:'grocery' },
+    { label:'Personal', bv:base.dating+base.gym, sv:scen.dating+scen.gym },
+    { label:'Travel', bk:'travel', sk:'travel' },
+    { label:'Celebrations/Gifts', bk:'celebrations', sk:'celebrations' },
+    { label:'Savings', bk:'savingsMo', sk:'savingsMo' },
+    { label:'Total Expenses', bv:Math.round(bv.totalExpenses), sv:Math.round(sv.totalExpenses), bold:true },
+    { label:'Net Cash Flow', bv:Math.round(bv.net), sv:Math.round(sv.net), bold:true, color:true },
+  ];
+
+  document.getElementById('cmp-table').innerHTML = rows.map(r => {
+    const bVal = r.bv !== undefined ? r.bv : base[r.bk];
+    const sVal = r.sv !== undefined ? r.sv : scen[r.sk];
+    const delta = sVal - bVal;
+    const same = delta === 0;
+    const posGood = r.color || (!r.label.includes('Expense') && !r.label.includes('Mortgage') && !r.label.includes('Bills') && !r.label.includes('Ins') && !r.label.includes('Fee') && !r.label.includes('Savings'));
+    const cls = same ? '' : ((posGood ? delta > 0 : delta < 0) ? 'td-g' : 'td-r');
+    return `<tr class="${r.bold ? 'tr-total' : ''}">
+      <td>${r.label}</td>
+      <td>${fmt(bVal)}</td>
+      <td style="color:var(--amber)">${fmt(sVal)}</td>
+      <td class="${cls}">${same ? '—' : fmtS(delta)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Charts ─────────────────────────────────────────────────────────────── */
+function renderChartDashDonut(d, cv) {
+  destroyChart('dashDonut');
+  charts['dashDonut'] = new Chart(document.getElementById('c-dash-donut'), {
+    type:'doughnut',
+    data:{
+      labels:['Mortgage+OC','Bills','Transport&Ins','Food','Personal','Discretionary','Savings'],
+      datasets:[{
+        data:[cv.housing,cv.bills,cv.transport,cv.food,cv.personal,cv.discretionary,d.savingsMo].map(Math.round),
+        backgroundColor:[alpha(C.red,.8),alpha(C.purple,.8),alpha(C.cyan,.8),alpha(C.amber,.8),alpha(C.pink,.8),alpha(C.blue,.7),alpha(C.green,.8)],
+        borderWidth:2,borderColor:'#1e293b'
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{boxWidth:11,padding:10,font:{size:11}}}}}
+  });
+}
+
+function renderChartDashBar(d, cv) {
+  destroyChart('dashBar');
+  charts['dashBar'] = new Chart(document.getElementById('c-dash-bar'), {
+    type:'bar',
+    data:{
+      labels:['Salary','Rental','Mortgage','OC','Bills','Transport','Food','Personal','Discret.','Savings'],
+      datasets:[
+        {label:'Income',data:[d.salary,d.rentIncome,0,0,0,0,0,0,0,0],backgroundColor:alpha(C.green,.75),stack:'a'},
+        {label:'Expense',data:[0,0,-d.mortgage,-d.oc,-cv.bills,-cv.transport,-cv.food,-cv.personal,-cv.discretionary,-d.savingsMo],backgroundColor:alpha(C.red,.75),stack:'a'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{boxWidth:11,font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>'$'+Math.abs(v).toLocaleString()}}}}
+  });
+}
+
+function renderChartIncomePie(d) {
+  destroyChart('incomePie');
+  charts['incomePie'] = new Chart(document.getElementById('c-income-pie'), {
+    type:'doughnut',
+    data:{
+      labels:['Salary','Rental Income'],
+      datasets:[{
+        data:[d.salary, d.rentIncome],
+        backgroundColor:[alpha(C.blue,.8),alpha(C.pink,.8)],
+        borderWidth:2,borderColor:'#1e293b'
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{boxWidth:11,padding:8,font:{size:12}}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.parsed)}`}}}}
+  });
+}
+
+function renderChartExpBar(d) {
+  destroyChart('expBar');
+  const items = [
+    {l:'Mortgage',v:d.mortgage,c:C.red},{l:'Travel',v:d.travel,c:C.blue},
+    {l:'OC Fee',v:d.oc,c:C.red},{l:'Savings',v:d.savingsMo,c:C.green},
+    {l:'Grocery',v:d.grocery,c:C.amber},{l:'Car Ins',v:d.carIns,c:C.cyan},
+    {l:'Dating',v:d.dating,c:C.pink},{l:'Transport',v:d.transport,c:C.purple},
+    {l:'Celebrations',v:d.celebrations,c:C.blue},{l:'Electricity',v:d.electricity,c:C.purple},
+    {l:'AASW',v:d.aasw,c:C.cyan},{l:'Health Ins',v:d.healthIns,c:C.cyan},
+    {l:'Internet',v:d.internet,c:C.purple},{l:'Water',v:d.water,c:C.purple},
+    {l:'Hot Water',v:d.hotWater,c:C.purple},{l:'Gym',v:d.gym,c:C.pink},
+    {l:'Netflix',v:d.netflix,c:C.purple},
+  ].sort((a,b)=>b.v-a.v);
+  charts['expBar'] = new Chart(document.getElementById('c-exp-bar'), {
+    type:'bar',
+    data:{labels:items.map(i=>i.l),datasets:[{label:'Monthly $',data:items.map(i=>i.v),backgroundColor:items.map(i=>alpha(i.c,.8))}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}
+  });
+}
+
+function renderChartPropBar(d, cv) {
+  destroyChart('propBar');
+  charts['propBar'] = new Chart(document.getElementById('c-prop-bar'), {
+    type:'bar',
+    data:{
+      labels:['Monthly Rental Income','Mortgage','Owner Corp Fee','Net Cash Flow'],
+      datasets:[{
+        data:[d.rentIncome, -d.mortgage, -d.oc, cv.propertyNet],
+        backgroundColor:[alpha(C.green,.8),alpha(C.red,.8),alpha(C.amber,.8), cv.propertyNet >= 0 ? alpha(C.green,.8) : alpha(C.red,.5)]
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+Math.abs(v).toLocaleString()}}}}
+  });
+}
+
+function renderSavingsForecast(d) {
+  const rows = buildForecast(d, 36);
+  const scRows = buildForecast(scenarioData, 36);
+  const hasDelta = JSON.stringify(baseData) !== JSON.stringify(scenarioData);
+  const datasets = [
+    {label:'Savings Balance',data:rows.map(r=>r.bal),borderColor:C.pink,backgroundColor:alpha(C.pink,.1),fill:true,tension:.3,pointRadius:2},
+    {label:'House Deposit Goal',data:Array(36).fill(d.goalDeposit),borderColor:C.amber,borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Emergency Fund',data:Array(36).fill(d.goalEmergency),borderColor:C.green,borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ];
+  if (hasDelta) datasets.push({label:'Scenario',data:scRows.map(r=>r.bal),borderColor:C.amber,borderWidth:1.5,borderDash:[6,3],tension:.3,pointRadius:0,fill:false});
+
+  destroyChart('savingsLine');
+  charts['savingsLine'] = new Chart(document.getElementById('c-savings-line'), {
+    type:'line',data:{labels:rows.map(r=>r.label),datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{boxWidth:11,font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}
+  });
+}
+
+function renderChartCmp(bv, sv) {
+  destroyChart('cmpBar');
+  charts['cmpBar'] = new Chart(document.getElementById('c-cmp-bar'), {
+    type:'bar',
+    data:{
+      labels:['Total Income','Total Expenses','Net Cash Flow'],
+      datasets:[
+        {label:'Base',data:[Math.round(bv.totalIncome),Math.round(bv.totalExpenses),Math.round(bv.net)],backgroundColor:alpha(C.blue,.7)},
+        {label:'Scenario',data:[Math.round(sv.totalIncome),Math.round(sv.totalExpenses),Math.round(sv.net)],backgroundColor:alpha(C.amber,.7)}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{boxWidth:11,font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString()}}}}
+  });
+}
+
+function renderChartSumPie(d) {
+  destroyChart('sumPie');
+  charts['sumPie'] = new Chart(document.getElementById('c-sum-pie'), {
+    type:'doughnut',
+    data:{
+      labels:['Salary','Rental Income'],
+      datasets:[{
+        data:[d.salary, d.rentIncome],
+        backgroundColor:[alpha(C.blue,.8),alpha(C.pink,.8)],
+        borderWidth:2,borderColor:'#1e293b'
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:11,padding:8,font:{size:11}}}}}
+  });
+}
+
+/* ── Input handlers ─────────────────────────────────────────────────────── */
+function onFieldChange(el, key) {
+  const v = parseFloat(el.value) || 0;
+  if (mode === 'base') baseData[key] = v;
+  else scenarioData[key] = v;
+  const rangeEl = document.getElementById(el.id + '-range');
+  if (rangeEl) rangeEl.value = v;
+  saveState();
+  render();
+}
+
+function syncRangeToInput(rangeId, inputId, key) {
+  const v = parseFloat(document.getElementById(rangeId).value);
+  document.getElementById(inputId).value = v;
+  if (mode === 'base') baseData[key] = v;
+  else scenarioData[key] = v;
+  saveState();
+  render();
+}
+
+/* ── Mode switching ─────────────────────────────────────────────────────── */
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-base').classList.toggle('active', m === 'base');
+  document.getElementById('btn-scen').classList.toggle('active', m === 'scenario');
+  const banner = document.getElementById('scenario-banner');
+  if (m === 'scenario') banner.classList.remove('hidden');
+  else banner.classList.add('hidden');
+  syncFieldsToData();
+  render();
+}
+
+function applyScenario() {
+  baseData = Object.assign({}, scenarioData);
+  saveState();
+  setMode('base');
+}
+
+function discardScenario() {
+  scenarioData = Object.assign({}, baseData);
+  saveState();
+  setMode('base');
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+function resetToDefaults() {
+  if (!confirm('Reset all values to spreadsheet defaults? This cannot be undone.')) return;
+  baseData = Object.assign({}, DEFAULTS);
+  scenarioData = Object.assign({}, DEFAULTS);
+  saveState();
+  setMode('base');
+  syncFieldsToData();
+  render();
+}
+
+/* ── Sync fields → active data ──────────────────────────────────────────── */
+function syncFieldsToData() {
+  const active = mode === 'base' ? baseData : scenarioData;
+  Object.keys(FIELD_MAP).forEach(key => {
+    const el = document.getElementById(FIELD_MAP[key]);
+    if (el && el.tagName === 'INPUT') el.value = active[key];
+  });
+  document.getElementById('f-travel-range').value = active.travel;
+  document.getElementById('f-savingsmo-range').value = active.savingsMo;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById(item.dataset.s).classList.add('active');
+    if (window.innerWidth <= 900) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+  });
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+/* ── Init ───────────────────────────────────────────────────────────────── */
+loadState();
+syncFieldsToData();
+render();
+</script>
+</body>
+</html>
