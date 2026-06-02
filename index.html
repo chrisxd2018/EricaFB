@@ -241,6 +241,35 @@ select.tk-input{cursor:pointer}
 .limit-bar-bg{height:6px;background:var(--surface2);border-radius:9999px;overflow:hidden}
 .limit-bar-fill{height:100%;border-radius:9999px;transition:width .4s ease,background .3s}
 
+/* ── Export modal ────────────────────────────────────────────────────────── */
+.export-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;align-items:center;justify-content:center}
+.export-modal-backdrop.open{display:flex}
+.export-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:420px;max-width:95vw}
+.export-modal h2{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.export-modal .em-sub{font-size:.78rem;color:var(--muted);margin-bottom:20px}
+.export-scope{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.scope-btn{padding:10px 6px;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;line-height:1.4}
+.scope-btn:hover{border-color:var(--pink);color:var(--pink)}
+.scope-btn.sel{background:var(--pink);border-color:var(--pink);color:#fff}
+.export-formats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.fmt-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;
+  border-radius:8px;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.fmt-btn:hover{border-color:var(--pink);background:rgba(236,72,153,.1)}
+.fmt-btn .fmt-icon{font-size:1.3rem}
+.fmt-btn.csv-btn:hover{border-color:var(--green);background:var(--green-dim)}
+.fmt-btn.xlsx-btn:hover{border-color:var(--blue);background:var(--blue-dim)}
+.export-checklist{margin-bottom:20px}
+.export-checklist label{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:.82rem;cursor:pointer;color:var(--muted)}
+.export-checklist label:hover{color:var(--text)}
+.export-checklist input[type=checkbox]{accent-color:var(--pink);width:14px;height:14px;cursor:pointer}
+.export-checklist input[type=checkbox]:checked + span{color:var(--text)}
+.em-divider{height:1px;background:var(--border);margin:14px 0}
+.em-close{display:block;width:100%;padding:8px;border-radius:7px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s}
+.em-close:hover{color:var(--text)}
+
 /* ── Hamburger / mobile ──────────────────────────────────────────────────── */
 #ham{display:none;position:fixed;top:12px;left:12px;z-index:200;
   background:var(--surface);border:1px solid var(--border);border-radius:7px;
@@ -285,6 +314,7 @@ select.tk-input{cursor:pointer}
     <div class="nav-item" data-s="tracker"><span class="nav-icon">⚡</span>Tracker</div>
     <div class="nav-item" data-s="compare"><span class="nav-icon">⚖️</span>Comparison</div>
     <div class="nav-item" data-s="summary"><span class="nav-icon">📋</span>Summary</div>
+    <div class="nav-item" data-s="exportview"><span class="nav-icon">⬇️</span>Export</div>
   </nav>
   <div class="sb-footer">
     <div id="storage-status">Changes saved locally</div>
@@ -962,6 +992,100 @@ select.tk-input{cursor:pointer}
 
   <div class="insight-grid mt6" id="insights"></div>
 </section>
+
+<!-- ── EXPORT ─────────────────────────────────────────────────────────────── -->
+<section id="exportview" class="section">
+  <div class="pg-title">Export</div>
+  <div class="pg-sub">Download your financial data as CSV or Excel — works offline, no backend needed</div>
+
+  <div class="card-grid g3">
+
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="section-hd" style="color:var(--green)">📄 Base Data</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Export your spreadsheet defaults: income assumptions, expense budget, savings targets, and fortnightly inputs exactly as entered.
+      </p>
+      <div style="display:flex;gap:8px">
+        <button class="fmt-btn csv-btn" style="flex:1" onclick="doExport('base','csv')">
+          <span class="fmt-icon">📊</span> CSV
+        </button>
+        <button class="fmt-btn xlsx-btn" style="flex:1" onclick="doExport('base','xlsx')">
+          <span class="fmt-icon">📗</span> Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div class="section-hd" style="color:var(--amber)">🔮 Current Scenario</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Export scenario values with base vs scenario variance. Useful for testing "what if" assumptions in a spreadsheet.
+      </p>
+      <div style="display:flex;gap:8px">
+        <button class="fmt-btn csv-btn" style="flex:1" onclick="doExport('scenario','csv')">
+          <span class="fmt-icon">📊</span> CSV
+        </button>
+        <button class="fmt-btn xlsx-btn" style="flex:1" onclick="doExport('scenario','xlsx')">
+          <span class="fmt-icon">📗</span> Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="card" style="border-top:3px solid var(--pink)">
+      <div class="section-hd" style="color:var(--pink)">📦 Everything</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Full export: dashboard summary, all inputs, savings plan, daily expense log, and budget vs actuals — all sheets in one file.
+      </p>
+      <div style="display:flex;gap:8px">
+        <button class="fmt-btn csv-btn" style="flex:1" onclick="doExport('all','csv')">
+          <span class="fmt-icon">📊</span> CSV (zip)
+        </button>
+        <button class="fmt-btn xlsx-btn" style="flex:1" onclick="doExport('all','xlsx')">
+          <span class="fmt-icon">📗</span> Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's included -->
+  <div class="card mt6">
+    <div class="section-hd">What's included in each export</div>
+    <div class="card-grid g2" style="gap:20px">
+      <div>
+        <table style="font-size:.82rem">
+          <thead><tr><th>Sheet / File</th><th>Base</th><th>Scenario</th><th>Everything</th></tr></thead>
+          <tbody>
+            <tr><td>Dashboard Summary</td><td class="td-g">✓</td><td class="td-g">✓</td><td class="td-g">✓</td></tr>
+            <tr><td>Income &amp; Expenses</td><td class="td-g">✓</td><td class="td-g">✓</td><td class="td-g">✓</td></tr>
+            <tr><td>Base vs Scenario Variance</td><td></td><td class="td-g">✓</td><td class="td-g">✓</td></tr>
+            <tr><td>Savings Plan &amp; Forecast</td><td class="td-g">✓</td><td class="td-g">✓</td><td class="td-g">✓</td></tr>
+            <tr><td>Property Cash Flow</td><td class="td-g">✓</td><td class="td-g">✓</td><td class="td-g">✓</td></tr>
+            <tr><td>Daily Expense Log</td><td></td><td></td><td class="td-g">✓</td></tr>
+            <tr><td>Budget vs Actuals</td><td></td><td></td><td class="td-g">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);line-height:1.8">
+        <div><strong style="color:var(--text)">CSV:</strong> Each sheet becomes a separate <code>.csv</code> file. The "Everything" CSV export downloads as individual files named by sheet.</div>
+        <div style="margin-top:10px"><strong style="color:var(--text)">Excel (.xlsx):</strong> All sheets in a single <code>.xlsx</code> workbook with named tabs — ready to open in Excel or import into Google Sheets via File → Import.</div>
+        <div style="margin-top:10px"><strong style="color:var(--text)">Google Sheets tip:</strong> Open Google Sheets → File → Import → Upload the .csv or .xlsx file.</div>
+        <div style="margin-top:10px"><strong style="color:var(--text)">Dates:</strong> Exported in <code>YYYY-MM-DD</code> format, which Google Sheets and Excel both parse automatically.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Export modal (progress indicator) ──────────────────────────────────── -->
+<div class="export-modal-backdrop" id="export-modal" onclick="if(event.target===this)closeExportModal()">
+  <div class="export-modal">
+    <h2>⬇️ Preparing Export…</h2>
+    <div class="em-sub" id="export-modal-msg">Building your file…</div>
+    <div style="height:4px;background:var(--surface2);border-radius:9999px;overflow:hidden">
+      <div id="export-progress" style="height:100%;background:var(--pink);border-radius:9999px;transition:width .3s;width:0%"></div>
+    </div>
+    <div class="em-divider"></div>
+    <button class="em-close" onclick="closeExportModal()">Close</button>
+  </div>
+</div>
 
 </main>
 
@@ -2025,6 +2149,509 @@ function navigate(sectionId) {
 
 /* ══════════════════════════════════════════════════════════════════════════
    END TRACKER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EXPORT ENGINE
+   Generates CSV and XLSX (client-side, no backend, GitHub Pages compatible).
+   XLSX is built manually using the Office Open XML spec — no external lib needed.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Modal helpers ───────────────────────────────────────────────────────── */
+function showExportModal(msg) {
+  document.getElementById('export-modal-msg').textContent = msg;
+  document.getElementById('export-progress').style.width = '0%';
+  document.getElementById('export-modal').classList.add('open');
+}
+function updateExportProgress(pct, msg) {
+  document.getElementById('export-progress').style.width = pct + '%';
+  if (msg) document.getElementById('export-modal-msg').textContent = msg;
+}
+function closeExportModal() {
+  document.getElementById('export-modal').classList.remove('open');
+}
+
+/* ── Date helpers ────────────────────────────────────────────────────────── */
+function isoNow() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* ── Sheet builders — return array-of-arrays ─────────────────────────────── */
+function sheetDashboard(d, cv) {
+  const m = FN_TO_MO;
+  return [
+    ['EricaFB — Dashboard Summary', '', ''],
+    ['Exported', isoNow(), ''],
+    ['', '', ''],
+    ['INCOME', 'Monthly ($)', 'Annual ($)'],
+    ['Salary',         +(d.salary * m).toFixed(2),      +(d.salary * 26).toFixed(2)],
+    ['Rental Income',  +(d.rentIncome * m).toFixed(2),  +(d.rentIncome * 26).toFixed(2)],
+    ['Total Income',   +cv.totalIncome.toFixed(2),       +(cv.totalIncome * 12).toFixed(2)],
+    ['', '', ''],
+    ['EXPENSES (excl. savings)', 'Monthly ($)', 'Annual ($)'],
+    ['Mortgage',            +(d.mortgage * m).toFixed(2),        +(d.mortgage * 26).toFixed(2)],
+    ['Owner Corp Fee',       +(d.oc * m).toFixed(2),              +(d.oc * 26).toFixed(2)],
+    ['Electricity',          +(d.electricity * m).toFixed(2),     ''],
+    ['Water',                +(d.water * m).toFixed(2),           ''],
+    ['Hot Water',            +(d.hotWater * m).toFixed(2),        ''],
+    ['Internet',             +(d.internet * m).toFixed(2),        ''],
+    ['Netflix',              +(d.netflix * m).toFixed(2),         ''],
+    ['Transport',            +(d.transport * m).toFixed(2),       ''],
+    ['Health Insurance',     +(d.healthIns * m).toFixed(2),       ''],
+    ['Car Insurance & Rego', +(d.carIns * m).toFixed(2),          ''],
+    ['AASW Membership',      +(d.aasw * m).toFixed(2),            ''],
+    ['Grocery',              +(d.grocery * m).toFixed(2),         ''],
+    ['Dating / Entertainment',+(d.dating * m).toFixed(2),         ''],
+    ['Gym',                  +(d.gym * m).toFixed(2),             ''],
+    ['Celebrations / Gifts', +(d.celebrations * m).toFixed(2),   ''],
+    ['Travel',               +(d.travel * m).toFixed(2),          ''],
+    ['Total Expenses',       +cv.totalExpenses.toFixed(2),        +(cv.totalExpenses * 12).toFixed(2)],
+    ['', '', ''],
+    ['CASH FLOW', 'Monthly ($)', ''],
+    ['Remaining Cash Flow',  +cv.remaining.toFixed(2), ''],
+    ['Savings Allocation',   +cv.savings.toFixed(2),   ''],
+    ['Free Cash',            +cv.freeCash.toFixed(2),  ''],
+    ['Savings Rate',         +((cv.savingsRate * 100).toFixed(2)) + '%', ''],
+    ['', '', ''],
+    ['PROPERTY', 'Monthly ($)', ''],
+    ['Rental Income',        +(d.rentIncome * m).toFixed(2), ''],
+    ['Mortgage',             +(d.mortgage * m).toFixed(2),  ''],
+    ['Owner Corp Fee',       +(d.oc * m).toFixed(2),        ''],
+    ['Property Net Cash Flow',+cv.propertyNet.toFixed(2),   ''],
+    ['Rental Cover Ratio',   +((cv.rentalCoverRatio * 100).toFixed(1)) + '%', ''],
+  ];
+}
+
+function sheetScenarioVariance() {
+  const bv = calc(baseData), sv = calc(scenarioData);
+  const m = FN_TO_MO;
+  const row = (label, bFn, sFn, isIncome) => {
+    const bVal = typeof bFn === 'function' ? bFn() : bFn;
+    const sVal = typeof sFn === 'function' ? sFn() : sFn;
+    const variance = +(sVal - bVal).toFixed(2);
+    return [label, +bVal.toFixed(2), +sVal.toFixed(2), variance];
+  };
+  return [
+    ['Base vs Scenario Variance', '', '', ''],
+    ['Exported', isoNow(), '', ''],
+    ['', '', '', ''],
+    ['Item', 'Base ($)', 'Scenario ($)', 'Variance ($)'],
+    row('Salary (monthly)',          baseData.salary * m,       scenarioData.salary * m),
+    row('Rental Income (monthly)',   baseData.rentIncome * m,   scenarioData.rentIncome * m),
+    row('Total Income',              bv.totalIncome,             sv.totalIncome),
+    ['', '', '', ''],
+    row('Mortgage (monthly)',        baseData.mortgage * m,     scenarioData.mortgage * m),
+    row('OC Fee (monthly)',          baseData.oc * m,           scenarioData.oc * m),
+    row('Bills & Utilities',         bv.bills,                   sv.bills),
+    row('Transport & Insurance',     bv.transport,               sv.transport),
+    row('Food',                      bv.food,                    sv.food),
+    row('Personal',                  bv.personal,                sv.personal),
+    row('Discretionary',             bv.discretionary,           sv.discretionary),
+    row('Total Expenses',            bv.totalExpenses,           sv.totalExpenses),
+    ['', '', '', ''],
+    row('Savings Allocation',        bv.savings,                 sv.savings),
+    row('Remaining Cash Flow',       bv.remaining,               sv.remaining),
+    row('Free Cash',                 bv.freeCash,                sv.freeCash),
+    row('Savings Rate',              bv.savingsRate * 100,       sv.savingsRate * 100),
+  ];
+}
+
+function sheetSavingsPlan(d) {
+  const savMo = d.savingsMo * FN_TO_MO;
+  const goals = [
+    { name: 'House Deposit',    target: d.goalDeposit },
+    { name: 'Emergency Fund',   target: d.goalEmergency },
+    { name: 'Long-term Wealth', target: d.goalWealth },
+  ];
+  const rows = [
+    ['Savings Plan', '', '', ''],
+    ['Exported', isoNow(), '', ''],
+    ['', '', '', ''],
+    ['CURRENT POSITION', '', '', ''],
+    ['Current Balance ($)',   d.savBal, '', ''],
+    ['Monthly Contribution ($)', +savMo.toFixed(2), '', ''],
+    ['', '', '', ''],
+    ['GOALS', 'Target ($)', 'Current ($)', 'ETA', 'Remaining ($)'],
+    ...goals.map(g => {
+      const remaining = Math.max(0, g.target - d.savBal);
+      const eta = d.savBal >= g.target ? 'Reached' : etaLabel(d.savBal, g.target, savMo);
+      return [g.name, g.target, d.savBal, eta, remaining];
+    }),
+    ['', '', '', '', ''],
+    ['MONTHLY FORECAST', 'Date', 'Balance ($)', 'vs House Deposit ($)', ''],
+    ...buildForecast(d, 36).map(r => {
+      const dt = new Date(2026, 3 + buildForecast(d,36).indexOf(r));
+      const iso = r.label; // already formatted
+      return ['', iso, r.bal, +(r.bal - d.goalDeposit).toFixed(2), ''];
+    }),
+  ];
+  // Rebuild forecast rows properly
+  const forecast = buildForecast(d, 36);
+  const cleanRows = [
+    ['Savings Plan', '', '', '', ''],
+    ['Exported', isoNow(), '', '', ''],
+    ['', '', '', '', ''],
+    ['CURRENT POSITION', '', '', '', ''],
+    ['Current Balance ($)', d.savBal, '', '', ''],
+    ['Monthly Contribution ($)', +savMo.toFixed(2), '', '', ''],
+    ['Fortnightly Contribution ($)', d.savingsMo, '', '', ''],
+    ['', '', '', '', ''],
+    ['GOALS', 'Target ($)', 'Current Balance ($)', 'Remaining ($)', 'ETA'],
+    ...goals.map(g => {
+      const rem = Math.max(0, g.target - d.savBal);
+      const eta = d.savBal >= g.target ? 'Reached ✓' : etaLabel(d.savBal, g.target, savMo);
+      return [g.name, g.target, d.savBal, rem, eta];
+    }),
+    ['', '', '', '', ''],
+    ['MONTHLY FORECAST', 'Period', 'Projected Balance ($)', 'vs House Deposit ($)', ''],
+    ...forecast.map(r => ['', r.label, r.bal, +(r.bal - d.goalDeposit).toFixed(2), '']),
+  ];
+  return cleanRows;
+}
+
+function sheetDailyExpenses() {
+  if (!transactions.length) return [['No daily expenses logged yet.']];
+  const rows = [
+    ['Daily Expense Log', '', '', '', ''],
+    ['Exported', isoNow(), '', '', ''],
+    ['', '', '', '', ''],
+    ['Date', 'Category', 'Amount ($)', 'Notes', 'Month'],
+    ...transactions.slice().sort((a,b) => b.date.localeCompare(a.date)).map(t => {
+      const mo = t.date.slice(0,7); // YYYY-MM
+      return [t.date, t.cat, +t.amount.toFixed(2), t.notes || '', mo];
+    }),
+  ];
+  return rows;
+}
+
+function sheetBudgetVsActuals(d) {
+  const budgets = getBudgets();
+  const catTotals = monthlyByCat();
+  const cats = Array.from(new Set([...Object.keys(budgets), ...Object.keys(catTotals)]));
+  return [
+    ['Budget vs Actuals — This Month', '', '', '', ''],
+    ['Exported', isoNow(), '', '', ''],
+    ['Month', new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'}), '', '', ''],
+    ['', '', '', '', ''],
+    ['Category', 'Budget ($)', 'Actual ($)', 'Variance ($)', 'Status'],
+    ...cats.map(cat => {
+      const budget = budgets[cat] || 0;
+      const actual = catTotals[cat] || 0;
+      const variance = +(actual - budget).toFixed(2);
+      const status = budget === 0 ? 'Unbudgeted' : actual > budget ? 'Over' : 'Under';
+      return [cat, budget, +actual.toFixed(2), variance, status];
+    }),
+    ['', '', '', '', ''],
+    ['TOTALS', '', '', '', ''],
+    ['Total Budget', Object.values(budgets).reduce((s,v)=>s+v,0), '', '', ''],
+    ['Total Actual', +Object.values(catTotals).reduce((s,v)=>s+v,0).toFixed(2), '', '', ''],
+  ];
+}
+
+/* ── CSV helpers ──────────────────────────────────────────────────────────── */
+function sheetToCSV(rows) {
+  return rows.map(row =>
+    row.map(cell => {
+      const s = cell === null || cell === undefined ? '' : String(cell);
+      return (s.includes(',') || s.includes('"') || s.includes('\n'))
+        ? '"' + s.replace(/"/g, '""') + '"'
+        : s;
+    }).join(',')
+  ).join('\r\n');
+}
+
+function downloadCSV(filename, csvStr) {
+  const blob = new Blob(['﻿' + csvStr, { type: 'text/csv;charset=utf-8;' }]);
+  const url = URL.createObjectURL(new Blob(['﻿' + csvStr], { type: 'text/csv;charset=utf-8;' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ── XLSX builder (pure JS, no library) ──────────────────────────────────── */
+// Builds a minimal valid .xlsx (Office Open XML) with multiple sheets.
+// Numbers stay numeric, strings are inlined. Dates as strings (Google Sheets parses them).
+function buildXLSX(sheets) {
+  // sheets: [{name, rows: array-of-arrays}]
+
+  function xmlEscape(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+
+  // Shared strings table
+  const strMap = new Map(), strs = [];
+  function strIdx(s) {
+    s = String(s);
+    if (!strMap.has(s)) { strMap.set(s, strs.length); strs.push(s); }
+    return strMap.get(s);
+  }
+
+  // Column letter from 0-indexed col
+  function colLetter(n) {
+    let s = ''; n++;
+    while (n > 0) { s = String.fromCharCode(65 + ((n-1) % 26)) + s; n = Math.floor((n-1)/26); }
+    return s;
+  }
+
+  // Build worksheet XML
+  function wsXML(rows) {
+    let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+      + '<sheetData>';
+    rows.forEach((row, ri) => {
+      xml += `<row r="${ri+1}">`;
+      row.forEach((cell, ci) => {
+        const ref = colLetter(ci) + (ri+1);
+        if (cell === null || cell === undefined || cell === '') {
+          // empty — omit
+        } else if (typeof cell === 'number') {
+          xml += `<c r="${ref}"><v>${cell}</v></c>`;
+        } else {
+          xml += `<c r="${ref}" t="s"><v>${strIdx(cell)}</v></c>`;
+        }
+      });
+      xml += '</row>';
+    });
+    xml += '</sheetData></worksheet>';
+    return xml;
+  }
+
+  // Shared strings XML
+  function ssXML() {
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + `<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${strs.length}" uniqueCount="${strs.length}">`
+      + strs.map(s => `<si><t>${xmlEscape(s)}</t></si>`).join('')
+      + '</sst>';
+  }
+
+  // Workbook XML
+  function wbXML() {
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+      + '<sheets>'
+      + sheets.map((s,i) => `<sheet name="${xmlEscape(s.name)}" sheetId="${i+1}" r:id="rId${i+2}"/>`).join('')
+      + '</sheets></workbook>';
+  }
+
+  // Relationships
+  function wbRels() {
+    let rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>';
+    sheets.forEach((s,i) => {
+      rels += `<Relationship Id="rId${i+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`;
+    });
+    rels += '</Relationships>';
+    return rels;
+  }
+
+  function pkgRels() {
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+      + '</Relationships>';
+  }
+
+  function contentTypes() {
+    let ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      + '<Default Extension="xml" ContentType="application/xml"/>'
+      + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      + '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>';
+    sheets.forEach((s,i) => {
+      ct += `<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;
+    });
+    ct += '</Types>';
+    return ct;
+  }
+
+  // Build all worksheet XMLs (this populates strMap via strIdx calls)
+  const wsXMLs = sheets.map(s => wsXML(s.rows));
+
+  // Now build file map
+  const files = {
+    '[Content_Types].xml': contentTypes(),
+    '_rels/.rels': pkgRels(),
+    'xl/workbook.xml': wbXML(),
+    'xl/_rels/workbook.xml.rels': wbRels(),
+    'xl/sharedStrings.xml': ssXML(),
+  };
+  wsXMLs.forEach((xml, i) => { files[`xl/worksheets/sheet${i+1}.xml`] = xml; });
+
+  // Simple ZIP builder
+  function strToBytes(str) {
+    const bytes = [];
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i);
+      if (code < 128) bytes.push(code);
+      else if (code < 2048) { bytes.push(0xC0|(code>>6)); bytes.push(0x80|(code&0x3F)); }
+      else { bytes.push(0xE0|(code>>12)); bytes.push(0x80|((code>>6)&0x3F)); bytes.push(0x80|(code&0x3F)); }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  function crc32(data) {
+    let crc = 0xFFFFFFFF;
+    const table = [];
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[i] = c;
+    }
+    for (let i = 0; i < data.length; i++) crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function u32le(n) { return [n & 0xFF, (n>>8)&0xFF, (n>>16)&0xFF, (n>>24)&0xFF]; }
+  function u16le(n) { return [n & 0xFF, (n>>8)&0xFF]; }
+
+  const centralDir = [];
+  let offset = 0;
+  const localHeaders = [];
+
+  Object.entries(files).forEach(([name, content]) => {
+    const nameBytes = strToBytes(name);
+    const dataBytes = strToBytes(content);
+    const crc = crc32(dataBytes);
+    const size = dataBytes.length;
+
+    const localHeader = [
+      0x50, 0x4B, 0x03, 0x04, // local file header sig
+      0x14, 0x00,              // version needed: 2.0
+      0x00, 0x00,              // flags
+      0x00, 0x00,              // compression: stored
+      0x00, 0x00, 0x00, 0x00, // mod time/date
+      ...u32le(crc),
+      ...u32le(size), ...u32le(size),
+      ...u16le(nameBytes.length), 0x00, 0x00,
+      ...nameBytes,
+      ...dataBytes,
+    ];
+
+    centralDir.push([
+      0x50, 0x4B, 0x01, 0x02,
+      0x14, 0x00, 0x14, 0x00,
+      0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00,
+      ...u32le(crc),
+      ...u32le(size), ...u32le(size),
+      ...u16le(nameBytes.length),
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00,
+      ...u32le(offset),
+      ...nameBytes,
+    ]);
+
+    localHeaders.push(localHeader);
+    offset += localHeader.length;
+  });
+
+  const cdOffset = offset;
+  const cdSize = centralDir.reduce((s, cd) => s + cd.length, 0);
+  const eocd = [
+    0x50, 0x4B, 0x05, 0x06,
+    0x00, 0x00, 0x00, 0x00,
+    ...u16le(centralDir.length), ...u16le(centralDir.length),
+    ...u32le(cdSize), ...u32le(cdOffset),
+    0x00, 0x00,
+  ];
+
+  const allBytes = [...localHeaders.flat(), ...centralDir.flat(), ...eocd];
+  return new Uint8Array(allBytes);
+}
+
+function downloadXLSX(filename, sheets) {
+  const data = buildXLSX(sheets);
+  const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ── Main export dispatcher ──────────────────────────────────────────────── */
+async function doExport(scope, format) {
+  showExportModal('Preparing your export…');
+  const date = isoNow();
+  const bd = baseData, sd = scenarioData;
+  const bv = calc(bd), sv = calc(sd);
+  const activeData = scope === 'scenario' ? sd : bd;
+  const activeCv   = scope === 'scenario' ? sv : bv;
+
+  await new Promise(r => setTimeout(r, 50)); // let modal render
+
+  try {
+    if (format === 'csv') {
+      if (scope === 'base') {
+        updateExportProgress(30, 'Building dashboard sheet…');
+        downloadCSV(`EricaFB_Base_Dashboard_${date}.csv`,   sheetToCSV(sheetDashboard(bd, bv)));
+        updateExportProgress(60, 'Building savings plan…');
+        downloadCSV(`EricaFB_Base_Savings_${date}.csv`,     sheetToCSV(sheetSavingsPlan(bd)));
+        updateExportProgress(90, 'Done.');
+      } else if (scope === 'scenario') {
+        updateExportProgress(30, 'Building dashboard sheet…');
+        downloadCSV(`EricaFB_Scenario_Dashboard_${date}.csv`, sheetToCSV(sheetDashboard(sd, sv)));
+        updateExportProgress(60, 'Building variance sheet…');
+        downloadCSV(`EricaFB_Scenario_Variance_${date}.csv`,  sheetToCSV(sheetScenarioVariance()));
+        updateExportProgress(90, 'Done.');
+      } else {
+        // all — download each CSV separately
+        updateExportProgress(15, 'Dashboard…');
+        downloadCSV(`EricaFB_Dashboard_${date}.csv`,         sheetToCSV(sheetDashboard(bd, bv)));
+        await new Promise(r => setTimeout(r, 200));
+        updateExportProgress(30, 'Scenario variance…');
+        downloadCSV(`EricaFB_Variance_${date}.csv`,          sheetToCSV(sheetScenarioVariance()));
+        await new Promise(r => setTimeout(r, 200));
+        updateExportProgress(50, 'Savings plan…');
+        downloadCSV(`EricaFB_Savings_${date}.csv`,           sheetToCSV(sheetSavingsPlan(bd)));
+        await new Promise(r => setTimeout(r, 200));
+        updateExportProgress(70, 'Daily expenses…');
+        downloadCSV(`EricaFB_DailyExpenses_${date}.csv`,     sheetToCSV(sheetDailyExpenses()));
+        await new Promise(r => setTimeout(r, 200));
+        updateExportProgress(90, 'Budget vs actuals…');
+        downloadCSV(`EricaFB_BudgetVsActuals_${date}.csv`,   sheetToCSV(sheetBudgetVsActuals(bd)));
+      }
+      updateExportProgress(100, 'Download complete ✓');
+    } else {
+      // XLSX
+      updateExportProgress(20, 'Building sheets…');
+      let xlSheets;
+      if (scope === 'base') {
+        xlSheets = [
+          { name: 'Dashboard',      rows: sheetDashboard(bd, bv) },
+          { name: 'Savings Plan',   rows: sheetSavingsPlan(bd) },
+        ];
+      } else if (scope === 'scenario') {
+        xlSheets = [
+          { name: 'Dashboard',      rows: sheetDashboard(sd, sv) },
+          { name: 'Variance',       rows: sheetScenarioVariance() },
+          { name: 'Savings Plan',   rows: sheetSavingsPlan(sd) },
+        ];
+      } else {
+        xlSheets = [
+          { name: 'Dashboard',      rows: sheetDashboard(bd, bv) },
+          { name: 'Variance',       rows: sheetScenarioVariance() },
+          { name: 'Savings Plan',   rows: sheetSavingsPlan(bd) },
+          { name: 'Daily Expenses', rows: sheetDailyExpenses() },
+          { name: 'Budget vs Actual',rows: sheetBudgetVsActuals(bd) },
+        ];
+      }
+      updateExportProgress(60, 'Packaging file…');
+      await new Promise(r => setTimeout(r, 30));
+      const scopeLabel = scope === 'base' ? 'Base' : scope === 'scenario' ? 'Scenario' : 'Full';
+      downloadXLSX(`EricaFB_${scopeLabel}_${date}.xlsx`, xlSheets);
+      updateExportProgress(100, 'Download complete ✓');
+    }
+  } catch (err) {
+    updateExportProgress(100, 'Error: ' + err.message);
+    console.error('Export error:', err);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   END EXPORT ENGINE
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Init ───────────────────────────────────────────────────────────────── */
