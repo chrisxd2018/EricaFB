@@ -287,6 +287,15 @@ select.tk-input{cursor:pointer}
   .insight-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){.g4{grid-template-columns:1fr 1fr}.kpi-val{font-size:1.3rem}}
+
+/* Month navigation bar */
+.month-nav{display:flex;align-items:center;gap:8px;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;width:fit-content}
+.month-nav-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;width:30px;height:30px;font-size:1.3rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.month-nav-btn:hover:not(:disabled){background:var(--surface3,var(--surface2));filter:brightness(1.1)}
+.month-nav-btn:disabled{opacity:.35;cursor:default}
+.month-nav-label{font-weight:600;font-size:.95rem;min-width:140px;text-align:center;color:var(--text)}
+.month-nav-today{background:var(--pink);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:.78rem;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.month-nav-today:hover{opacity:.85}
 </style>
 </head>
 <body>
@@ -745,6 +754,14 @@ select.tk-input{cursor:pointer}
   <div class="pg-title">Daily Tracker</div>
   <div class="pg-sub">Log expenses in seconds — totals flow into your dashboard automatically</div>
 
+  <!-- Month navigation -->
+  <div class="month-nav" id="month-nav">
+    <button class="month-nav-btn" onclick="navigateMonth(-1)" title="Previous month">&#8249;</button>
+    <span class="month-nav-label" id="month-nav-label"></span>
+    <button class="month-nav-btn" onclick="navigateMonth(1)" id="month-nav-next" title="Next month">&#8250;</button>
+    <button class="month-nav-today" id="month-nav-today" onclick="goToCurrentMonth()" style="display:none">Back to current month</button>
+  </div>
+
   <div class="card-grid g2">
 
     <!-- ── Quick-add panel ── -->
@@ -839,7 +856,7 @@ select.tk-input{cursor:pointer}
           <div class="tp-val" id="tt-week">$0</div>
         </div>
         <div class="total-pill">
-          <div class="tp-label">This Month</div>
+          <div class="tp-label" id="tt-month-label">This Month</div>
           <div class="tp-val" id="tt-month">$0</div>
         </div>
         <div class="total-pill">
@@ -880,13 +897,13 @@ select.tk-input{cursor:pointer}
 
   <!-- ── Top categories chart ── -->
   <div class="card mt4">
-    <div class="section-hd">Spending by Category <span>this month</span></div>
+    <div class="section-hd">Spending by Category <span id="tracker-cat-heading-sub">this month</span></div>
     <div class="chart-wrap" style="height:240px"><canvas id="c-tracker-cat"></canvas></div>
   </div>
 
   <!-- ── Daily spend chart ── -->
   <div class="card mt4">
-    <div class="section-hd">Daily Spend — Last 14 Days</div>
+    <div class="section-hd">Daily Spend — <span id="tracker-daily-heading-sub">Current Month</span></div>
     <div class="chart-wrap" style="height:200px"><canvas id="c-tracker-daily"></canvas></div>
   </div>
 </section>
@@ -1876,12 +1893,47 @@ function isThisWeek(dateStr) {
   startOfWeek.setHours(0,0,0,0);
   return d >= startOfWeek && d <= now;
 }
+
+/* viewMonth: { year, month (0-based) } — the month shown in the Tracker tab */
+const _now = new Date();
+let viewMonth = { year: _now.getFullYear(), month: _now.getMonth() };
+
+function isViewMonth(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.getFullYear() === viewMonth.year && d.getMonth() === viewMonth.month;
+}
+/* keep isThisMonth as an alias so dashboard strip / other callers still work */
 function isThisMonth(dateStr) {
   const now = new Date(); const d = new Date(dateStr + 'T00:00:00');
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
 }
-function dayOfMonth() { return new Date().getDate(); }
-function daysInMonth() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth()+1, 0).getDate(); }
+function dayOfMonth() {
+  const now = new Date();
+  const isCurrentMonth = viewMonth.year === now.getFullYear() && viewMonth.month === now.getMonth();
+  return isCurrentMonth ? now.getDate() : new Date(viewMonth.year, viewMonth.month + 1, 0).getDate();
+}
+function daysInMonth() { return new Date(viewMonth.year, viewMonth.month + 1, 0).getDate(); }
+
+function viewMonthLabel() {
+  return new Date(viewMonth.year, viewMonth.month, 1).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+}
+function isCurrentViewMonth() {
+  const now = new Date();
+  return viewMonth.year === now.getFullYear() && viewMonth.month === now.getMonth();
+}
+function navigateMonth(delta) {
+  let m = viewMonth.month + delta;
+  let y = viewMonth.year;
+  if (m > 11) { m = 0; y++; }
+  if (m < 0)  { m = 11; y--; }
+  viewMonth = { year: y, month: m };
+  renderTracker();
+}
+function goToCurrentMonth() {
+  const now = new Date();
+  viewMonth = { year: now.getFullYear(), month: now.getMonth() };
+  renderTracker();
+}
 function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-AU', {day:'numeric',month:'short'});
@@ -1962,13 +2014,13 @@ function deleteTxn(id) {
 
 /* ── Aggregate helpers ───────────────────────────────────────────────────── */
 function sumByPredicate(pred) { return transactions.filter(t => pred(t.date)).reduce((s,t) => s + t.amount, 0); }
-function sumThisMonth() { return sumByPredicate(isThisMonth); }
+function sumThisMonth() { return sumByPredicate(isViewMonth); }
 function sumToday() { return sumByPredicate(isToday); }
 function sumThisWeek() { return sumByPredicate(isThisWeek); }
 
 function monthlyByCat() {
   const result = {};
-  transactions.filter(t => isThisMonth(t.date)).forEach(t => {
+  transactions.filter(t => isViewMonth(t.date)).forEach(t => {
     result[t.cat] = (result[t.cat] || 0) + t.amount;
   });
   return result;
@@ -1976,17 +2028,30 @@ function monthlyByCat() {
 
 /* ── Render tracker section ──────────────────────────────────────────────── */
 function renderTracker() {
-  const today = sumToday();
-  const week  = sumThisWeek();
+  const isCurrent = isCurrentViewMonth();
+  const today = isCurrent ? sumToday() : 0;
+  const week  = isCurrent ? sumThisWeek() : 0;
   const month = sumThisMonth();
   const budgetTotal = totalMonthlyDiscretionary();
 
-  // Totals pills
-  set('tt-today', '$' + today.toFixed(2));
-  set('tt-week',  '$' + week.toFixed(2));
+  // Update month navigation display
+  const navLabel = document.getElementById('month-nav-label');
+  if (navLabel) navLabel.textContent = viewMonthLabel();
+  const todayBtn = document.getElementById('month-nav-today');
+  if (todayBtn) todayBtn.style.display = isCurrent ? 'none' : '';
+  const nextBtn = document.getElementById('month-nav-next');
+  if (nextBtn) nextBtn.disabled = isCurrent;
+
+  // Totals pills — hide today/week when viewing a past month
+  set('tt-today', isCurrent ? '$' + today.toFixed(2) : '—');
+  set('tt-week',  isCurrent ? '$' + week.toFixed(2) : '—');
   set('tt-month', '$' + month.toFixed(2));
   set('tt-budget','$' + budgetTotal.toLocaleString());
   document.getElementById('tt-month').style.color = month > budgetTotal ? C.red : C.green;
+
+  // Pill labels
+  const monthPillLabel = document.getElementById('tt-month-label');
+  if (monthPillLabel) monthPillLabel.textContent = isCurrent ? 'This Month' : viewMonthLabel().replace(/\s\d{4}$/, '');
 
   // Burn rate
   const dom = dayOfMonth();
@@ -1996,20 +2061,27 @@ function renderTracker() {
     ? '+$' + Math.round(projection - budgetTotal).toLocaleString() + ' over'
     : '−$' + Math.round(budgetTotal - projection).toLocaleString() + ' under';
   set('br-daily', '$' + dailyAvg.toFixed(0));
-  set('br-proj',  '$' + Math.round(projection).toLocaleString());
-  set('br-vs', vsLabel);
-  document.getElementById('br-vs').style.color = projection > budgetTotal ? C.red : C.green;
+  set('br-proj',  isCurrent ? '$' + Math.round(projection).toLocaleString() : '(final)');
+  set('br-vs', isCurrent ? vsLabel : (month > budgetTotal ? '+$' + Math.round(month - budgetTotal).toLocaleString() + ' over' : '−$' + Math.round(budgetTotal - month).toLocaleString() + ' under'));
+  document.getElementById('br-vs').style.color = month > budgetTotal ? C.red : C.green;
 
-  // Daily limit bar (budget ÷ days-in-month = daily target)
+  // Daily limit bar (only meaningful for current month)
   const dailyTarget = budgetTotal / daysInMonth();
   const limitPct = Math.min(100, (today / dailyTarget) * 100);
-  document.getElementById('daily-limit-fill').style.width = limitPct + '%';
+  document.getElementById('daily-limit-fill').style.width = isCurrent ? limitPct + '%' : '0%';
   document.getElementById('daily-limit-fill').style.background = limitPct > 100 ? C.red : limitPct > 75 ? C.amber : C.green;
-  set('daily-limit-label', '$' + today.toFixed(2) + ' today');
+  set('daily-limit-label', isCurrent ? '$' + today.toFixed(2) + ' today' : '(past month)');
   set('daily-limit-max', 'Daily target: $' + dailyTarget.toFixed(0));
 
-  // Transaction list (latest 50)
+  // Transaction list (filtered to selected month)
   renderTxList();
+
+  // Update section headings to reflect selected month
+  const monthShort = viewMonthLabel();
+  const catSub = document.getElementById('tracker-cat-heading-sub');
+  if (catSub) catSub.textContent = monthShort;
+  const dailySub = document.getElementById('tracker-daily-heading-sub');
+  if (dailySub) dailySub.textContent = monthShort;
 
   // Budget vs Actual bars
   renderBVA();
@@ -2021,10 +2093,12 @@ function renderTracker() {
 
 function renderTxList() {
   const list = document.getElementById('tx-list');
-  const shown = transactions.slice(0, 50);
-  set('tx-count-label', transactions.length + ' total');
+  const monthTxns = transactions.filter(t => isViewMonth(t.date));
+  const shown = monthTxns.slice(0, 100);
+  const label = viewMonthLabel();
+  set('tx-count-label', monthTxns.length + ' in ' + label + ' · ' + transactions.length + ' total');
   if (!shown.length) {
-    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;font-size:.82rem">No expenses yet — add one above ↑</div>';
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px 0;font-size:.82rem">No expenses in ' + label + '</div>';
     return;
   }
   list.innerHTML = shown.map(tx => `
@@ -2094,15 +2168,17 @@ function renderTrackerCatChart() {
 }
 
 function renderTrackerDailyChart() {
-  // Last 14 days
+  // Show all days in the selected month (up to today for current month)
   const labels = [], data = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    labels.push(String(d.getDate()) + '/' + String(d.getMonth()+1));
+  const totalDays = daysInMonth();
+  const isCurrent = isCurrentViewMonth();
+  const lastDay = isCurrent ? new Date().getDate() : totalDays;
+  for (let day = 1; day <= lastDay; day++) {
+    const ds = viewMonth.year + '-' + String(viewMonth.month + 1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    labels.push(String(day) + '/' + String(viewMonth.month + 1));
     data.push(transactions.filter(t => t.date === ds).reduce((s,t) => s + t.amount, 0));
   }
-  const dailyTarget = totalMonthlyDiscretionary() / daysInMonth();
+  const dailyTarget = totalMonthlyDiscretionary() / totalDays;
   destroyChart('trackerDaily');
   charts['trackerDaily'] = new Chart(document.getElementById('c-tracker-daily'), {
     type: 'bar',
@@ -2110,7 +2186,7 @@ function renderTrackerDailyChart() {
       labels,
       datasets: [
         { label: 'Spent', data, backgroundColor: data.map(v => alpha(v > dailyTarget ? C.red : C.pink, .75)), borderRadius: 4 },
-        { label: 'Daily target', data: Array(14).fill(dailyTarget), type: 'line', borderColor: alpha(C.amber,.7), borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false }
+        { label: 'Daily target', data: Array(lastDay).fill(dailyTarget), type: 'line', borderColor: alpha(C.amber,.7), borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false }
       ]
     },
     options: {
@@ -2124,7 +2200,8 @@ function renderTrackerDailyChart() {
 /* ── Dashboard tracker strip ─────────────────────────────────────────────── */
 function renderDashboardTrackerStrip() {
   const today = sumToday();
-  const month = sumThisMonth();
+  // Always show the real current-month total on the dashboard, regardless of viewMonth
+  const month = transactions.filter(t => isThisMonth(t.date)).reduce((s,t) => s + t.amount, 0);
   const budgetTotal = totalMonthlyDiscretionary();
   const remaining = budgetTotal - month;
   set('dt-today', '$' + today.toFixed(2));
